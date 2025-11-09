@@ -13,7 +13,7 @@ public class Bloated {
         n = n+2;
 
         if (n == 0) { // unreachable
-            int i = 2
+            int i = 2;
             n = i + n;
         }
 
