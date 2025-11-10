@@ -1,0 +1,25 @@
+{
+  "methods": [
+    {
+      "name": "simple_if",
+      "code": {
+        "bytecode": [
+          {
+            "offset": 0,
+            "opr": "push",
+            "value": 1
+          },
+          {
+            "offset": 1,
+            "opr": "goto",
+            "target": 3
+          },
+          {
+            "offset": 3,
+            "opr": "return"
+          }
+        ]
+      }
+    }
+  ]
+}
