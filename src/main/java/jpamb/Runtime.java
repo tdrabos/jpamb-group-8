@@ -21,6 +21,7 @@ public class Runtime {
       Loops.class,
       Tricky.class,
       jpamb.cases.Arrays.class,
+      Dependent.class,
       Calls.class);
 
   public static Case[] cases(Method m) {
