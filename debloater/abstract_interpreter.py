@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum, auto
+import string
 from typing import List, Dict, Tuple, Optional, Iterable, Union, Any, FrozenSet
 from copy import deepcopy
 from jpamb import jvm
@@ -8,73 +9,10 @@ import jpamb
 from solutions.interpreter import PC, Stack, State
 from debloater.abstractions.sign_abstraction import SignSet
 
-
-@dataclass(frozen=True)
-class AV:
-    ss: SignSet
-
-    @classmethod
-    def empty(cls) -> "AV":
-        return cls(SignSet.empty())
-
-    @classmethod
-    def abstract(cls, values):
-        ints = []
-        for v in values:
-            val = v.value if hasattr(v, "value") else v
-            try:
-                ints.append(int(val))
-            except Exception:
-                return cls(SignSet.of("+", "0", "-"))
-        return cls(SignSet.abstract(ints))
-
-    def __bool__(self) -> bool:
-        return bool(self.ss.signs)
-
-    def __le__(self, other: "AV") -> bool:
-        return self.ss <= other.ss
-
-    def __and__(self, other: "AV") -> "AV":
-        return AV(self.ss & other.ss)
-
-    def __or__(self, other: "AV") -> "AV":
-        return AV(self.ss | other.ss)
-
-    def add(self, other: "AV") -> "AV":
-        return AV(self.ss + other.ss)
-
-    def sub(self, other: "AV") -> "AV":
-        return AV(self.ss - other.ss)
-
-    def mul(self, other: "AV") -> "AV":
-        return AV(self.ss * other.ss)
-
-    def neg(self) -> "AV":
-        return AV(-self.ss)
-
-    def div(self, other: "AV") -> "AV":
-        # conservative: if divisor may be zero => TOP
-        if "0" in other.ss.signs:
-            return AV(SignSet.of("+", "0", "-"))
-        
-        out = set()
-        for sa in self.ss.signs:
-            for sb in other.ss.signs:
-                if sb == "0":
-                    return AV(SignSet.of("+", "0", "-"))
-                # '-' / '-' => '+', '+' / '-' => '-', etc.
-                if sa == "0":
-                    out.add("0")
-                elif sa == sb:
-                    out.add("+")
-                else:
-                    out.add("-")
-        return AV(SignSet(frozenset(out)))
-
 @dataclass
-class PerVarFrame:
+class PerVarFrame[AV]:
     locals: Dict[int, AV]
-    stack: Stack
+    stack: Stack[AV]
     pc: PC
 
     @classmethod
@@ -89,8 +27,6 @@ class PerVarFrame:
 
     ## Lattice methods (order, meet, join) ##
     
-    # Partial order: (local1, stack1) <= (locals2, stack2) iff (locals1 == locals2) and (stack1 <= stack2 pointwise)
-    # OR: if locals are AV too, the also compare them pointwise (TODO)
     def __le__(self, other: "PerVarFrame") -> bool:
         if self.pc != other.pc:
             return False
@@ -122,9 +58,10 @@ class PerVarFrame:
    
  
 @dataclass
-class AState:
-    heap: Dict[int, AV]       # abstract heap (addresses -> AV)
-    frames: Stack[PerVarFrame]   # stack of PerVarFrame (must be dataclass)
+class AState[AV]:
+    heap: Dict[int, str]         # abstract heap (addresses -> variable name)
+    constraints: Dict[str, AV]   # variable constraints (variable name -> abstract value)
+    frames: Stack[PerVarFrame]   # stack of PerVarFrame
 
     @classmethod
     def abstract(cls, s: State) -> "AState":
@@ -179,6 +116,35 @@ class AState:
             new_frames.append(j)
         return AState(new_heap, Stack(new_frames))
 
+@dataclass
+class StateSet[AV]:
+    per_inst : dict[PC, AV]
+    needswork : set[PC]
+
+    def per_instruction(self):
+        for pc in self.needswork: 
+            yield (pc, self.per_inst[pc])
+
+    # sts |= astate
+    def __ior__(self, astate):
+        pc = astate.pc
+        old = self.per_inst.get(pc)
+
+        if old is None:
+            # First time seeing this pc
+            self.per_inst[pc] = astate
+            self.needswork.add(pc)
+            return self
+
+        # Pointwise join
+        new = old.clone()
+        new |= astate
+        if new != old:
+            self.per_inst[pc] = new
+            self.needswork.add(pc)
+
+        return self
+
 _suite = jpamb.Suite()
 
 def _opcode_at(pc: PC):
@@ -186,7 +152,7 @@ def _opcode_at(pc: PC):
     return ops[pc.offset]
 
 # Step the abstract state (possibly returns more states due to branches)
-def step(state: AState) -> Iterable[AState | str]:
+def step[AV](state: AState[AV]) -> Iterable[AState[AV] | str]:
     assert isinstance(state, AState), "step expects AState"
     if not state.frames or not state.frames.items:
         return []  # nothing to do
@@ -334,7 +300,7 @@ def step(state: AState) -> Iterable[AState | str]:
             return targets
     
 
-def many_step(state : dict[PC, AState | str]) -> dict[PC, AState | str]:
+def many_step[AV](state : dict[PC, AState | str]) -> dict[PC, AState | str]:
   new_state = dict(state)
   for k, v in state.items():
       for s in step(v):
