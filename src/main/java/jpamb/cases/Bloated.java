@@ -19,7 +19,6 @@ public class Bloated {
 
         return 1;
     }
-    assert 10 > n;
     return 0;
   }
 }

@@ -12,6 +12,10 @@ class SignSet:
     and/or negative numbers are possible.
     """
     signs: frozenset[Sign]
+    
+    @classmethod
+    def top(cls) -> "SignSet":
+        return cls(frozenset(["+", "-", "0"]))
 
     @classmethod
     def empty(cls) -> "SignSet":
@@ -82,7 +86,7 @@ class SignSet:
         return SignSet(frozenset(out))
 
     # Addition
-    def __add__(self, other: "SignSet") -> "SignSet":
+    def add(self, other: "SignSet") -> "SignSet":
         add_table: dict[tuple[Sign, Sign], set[Sign]] = {
             # x + y -> possible sign(s)
             ("+", "+"): { "+" },
@@ -103,11 +107,11 @@ class SignSet:
         return SignSet(frozenset(mapping[s] for s in self.signs))
 
     # Subtraction
-    def __sub__(self, other: "SignSet") -> "SignSet":
+    def sub(self, other: "SignSet") -> "SignSet":
         return self + (-other)
 
     # Multiplication
-    def __mul__(self, other: "SignSet") -> "SignSet":
+    def mul(self, other: "SignSet") -> "SignSet":
         mul_table: dict[tuple[Sign, Sign], set[Sign]] = {
             ("+", "+"): { "+" },
             ("+", "0"): { "0" },
@@ -120,6 +124,23 @@ class SignSet:
             ("-", "-"): { "+" },
         }
         return self._lift_bin(self, other, mul_table)
+    
+    def div(self, other: "SignSet") -> "SignSet":
+        out: set[Sign] = set()
+        for sa in self.signs:
+            for sb in other.signs:
+                if sb == "0":
+                    # Division by zero is undefined: skip this pair
+                    continue
+                if sa == "0":
+                    out.add("0")
+                elif sa == sb:          # +/+ or -/- -> +
+                    out.add("+")
+                else:                   # +/- or -/+ -> -
+                    out.add("-")
+                if len(out) == 3:       # reached top {-,0,+}
+                    return SignSet(frozenset(out))
+        return SignSet(frozenset(out))
 
     # Absolute value
     def abs(self) -> "SignSet":
