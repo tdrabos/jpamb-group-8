@@ -148,6 +148,9 @@ class Push(Opcode):
             case jvm.Reference():
                 assert self.value.value is None, f"what is {self.value}"
                 return "aconst_null"
+            
+            case jvm.Boolean():
+                return "iconst_1" if self.value.value else "iconst_0"
 
         raise NotImplementedError(f"Unhandled {self!r}")
 
@@ -170,11 +173,15 @@ class Push(Opcode):
                     return "ldc"
             case jvm.Reference():
                 return "aconst_null"
+            
+            case jvm.Boolean():
+                return "iconst_1" if self.value.value else "iconst_0"
 
         raise NotImplementedError(f"Unhandled {self!r}")
 
     def __str__(self):
         return f"push:{self.value.type} {self.value.value}"
+#        return f""
 
 
 @dataclass(frozen=True, order=True)
@@ -565,6 +572,9 @@ class Store(Opcode):
         # Handle integer type
         elif isinstance(self.type, jvm.Int):
             return f"istore_{self.index}" if self.index < 4 else f"istore {self.index}"
+        
+        elif isinstance(self.type, jvm.Boolean):
+            return f"istore_{self.index}" if self.index < 4 else f"istore {self.index}"
         return super().real()
 
     def semantics(self) -> str | None:
@@ -575,6 +585,9 @@ class Store(Opcode):
             return "astore_n" if self.index < 4 else "astore"
         # Handle integer type
         elif isinstance(self.type, jvm.Int):
+            return "istore_n" if self.index < 4 else "istore"
+        
+        elif isinstance(self.type, jvm.Boolean):
             return "istore_n" if self.index < 4 else "istore"
         return ""
 
@@ -670,8 +683,13 @@ class Load(Opcode):
         # Handle integer type
         elif isinstance(self.type, jvm.Int):
             return f"iload_{self.index}" if self.index < 4 else f"iload {self.index}"
+        
+        elif isinstance(self.type, jvm.Boolean):
+            return f"iload_{self.index}" if self.index < 4 else f"iload {self.index}"
+
         return super().real()
 
+        
     def semantics(self) -> str | None:
         return None
 
@@ -680,6 +698,9 @@ class Load(Opcode):
             return "aload_n" if self.index < 4 else "aload"
         # Handle integer type
         elif isinstance(self.type, jvm.Int):
+            return "iload_n" if self.index < 4 else "iload"
+        
+        elif isinstance(self.type, jvm.Boolean):
             return "iload_n" if self.index < 4 else "iload"
         return ""
 
@@ -723,7 +744,7 @@ class If(Opcode):
             "le": "if_icmple",
         }
 
-        # For reference comparisons
+        # For reference comparisons - this handles arrays for if statement
         ref_cmp_map = {"is": "if_acmpeq", "isnot": "if_acmpne"}
 
         if self.condition in int_cmp_map:
