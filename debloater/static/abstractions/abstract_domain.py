@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterable, Self
+from typing import Iterable, Literal, Self
 
 class Domain[V](ABC):
     """
@@ -13,5 +13,7 @@ class Domain[V](ABC):
     @classmethod
     @abstractmethod
     def abstract(cls, elems: Iterable[V]) -> Self: ...
+    
+    def compare(self, other: V) -> frozenset[int]: ...
     
     # TODO: do the rest

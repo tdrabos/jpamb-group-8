@@ -5,8 +5,8 @@ import static jpamb.utils.Tag.TagType.*;
 
 public class Bloated {
     public static int unreachableBranchSign(int n) {
-    if (n != 0) {
-      return 1 / n;
+    if (n == 0) {
+      return 1 + n;
     }
 
     if (n > 0) {

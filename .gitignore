@@ -25,3 +25,4 @@ build/
 leananalyzer
 
 result
+.DS_STORE

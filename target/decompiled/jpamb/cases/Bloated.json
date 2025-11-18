@@ -82,7 +82,7 @@
             "type": "int"
           },
           {
-            "condition": "eq",
+            "condition": "ne",
             "offset": 1,
             "opr": "ifz",
             "target": 6
@@ -103,7 +103,7 @@
           },
           {
             "offset": 6,
-            "operant": "div",
+            "operant": "add",
             "opr": "binary",
             "type": "int"
           },
