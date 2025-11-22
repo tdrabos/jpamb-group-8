@@ -177,6 +177,74 @@ class Push(Opcode):
                     case 1:
                         return "dconfig_1"
                 return f"ldc2_w [{self.value.value}]"
+            #Handle Bytes
+            case jvm.Byte():
+                b = self.value.value
+                match b:
+                    case -1:
+                        return "iconst_m1"
+                    case 0:
+                        return "iconst_0"
+                    case 1:
+                        return "iconst_1"
+                    case 2:
+                        return "iconst_2"
+                    case 3:
+                        return "iconst_3"
+                    case 4:
+                        return "iconst_4"
+                    case 5:
+                        return "iconst_5"
+
+                if -128 <= b <= 127:
+                    return f"bipush {b}" 
+                return f"ldc [{b}]"
+            # Handle shorts
+            case jvm.Short():
+                s = self.value.value
+                match s:
+                    case -1:
+                        return "iconst_m1"
+                    case 0:
+                        return "iconst_0"
+                    case 1:
+                        return "iconst_1"
+                    case 2:
+                        return "iconst_2"
+                    case 3:
+                        return "iconst_3"
+                    case 4:
+                        return "iconst_4"
+                    case 5:
+                        return "iconst_5"
+                if -128 <= s <= 127:
+                    return f"bipush {s}"
+                if -32768 <= s <= 32767:
+                    return f"sipush {s}"
+                return f"ldc [{s}]"
+            # Handle char
+            case jvm.Char():
+                c = self.value.value
+                match c:
+                    case 0:
+                        return "iconst_0"
+                    case 1:
+                        return "iconst_1"
+                    case 2:
+                        return "iconst_2"
+                    case 3:
+                        return "iconst_3"
+                    case 4:
+                        return "iconst_4"
+                    case 5:
+                        return "iconst_5"
+                
+                if 0 <= c <= 127:
+                    return f"bipush {c}"
+                
+                if 0 <= c <= 65535:
+                    return f"sipush {c}"
+                return f"ldc [{c}]"
                             
         raise NotImplementedError(f"Unhandled {self!r}")
 
@@ -218,7 +286,35 @@ class Push(Opcode):
                 if self.value.value in (0, 1):
                     return "dconst"
                 else:
-                    return "ldc2_w"    
+                    return "ldc2_w"  
+            # Handle bytes
+            case jvm.Byte():
+                b = self.value.value
+                if -1 <= b <= 5:
+                    return "iconst"
+                if -128 <= b <= 127:
+                    return "bipush"
+                return "ldc"
+            # Handle shorts 
+            case jvm.Short():
+                s = self.value.value
+                if -1 <= s <= 5:
+                    return "iconst"
+                if -128 <= s <= 127:
+                    return "bipush"
+                if -32768 <= s <= 32767:
+                    return "sipush"
+                return "ldc"
+            #Handle Char
+            case jvm.Char():
+                c = self.value.value
+                if 0 <= c <=5:
+                    return "iconst"
+                if 0 <= c <= 65535:
+                    return "sipush"
+                return "ldc"
+
+                    
 
         raise NotImplementedError(f"Unhandled {self!r}")
 
