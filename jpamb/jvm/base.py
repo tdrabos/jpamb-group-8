@@ -143,6 +143,8 @@ class Type(ABC):
                     return Reference()
                 case "boolean":
                     return Boolean()
+                case "float":
+                    return Float()
         if "base" in json:
             return Type.from_json(json["base"])
         if "kind" in json:
@@ -356,7 +358,7 @@ class Long(StackType):
 
 
 @dataclass(frozen=True)
-class Float(Type):
+class Float(StackType):
     """
     A 32bit floating point number
     """

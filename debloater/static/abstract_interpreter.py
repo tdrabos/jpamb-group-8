@@ -1,20 +1,32 @@
 from dataclasses import dataclass
 import sys
-from enum import Enum, auto
-import string
-from typing import List, Dict, Self, Tuple, Optional, Iterable, Union, Any, FrozenSet
+from typing import List, Dict, Literal, Self, Tuple, Optional, Iterable, Union, Any, FrozenSet
 from copy import deepcopy
+from debloater.static.abstractions.interval_abstraction import Interval
 from jpamb import jvm
 import jpamb
 from loguru import logger
+import json
 
 from solutions.interpreter import PC, Bytecode, Stack, State
-from debloater.static.abstractions.sign_abstraction import SignSet
+from debloater.static.abstractions.sign_abstraction import SignSet, holds
+from debloater.static.utils.json_utils import dead_indices_to_lines_in_class
 
 op_hit = set()
+dead_store: dict[int, any] = dict()
+dead_arg: dict[int, any] = dict()
 
 logger.remove()
 logger.add(sys.stderr, format="[{level}] {message}", level="DEBUG")
+
+CmpRel = Literal[-1, 0, 1]
+
+@dataclass(frozen=True)
+class FloatCmpResult:
+    left_name: str
+    right_name: str
+    possible_rels: FrozenSet[CmpRel]
+    onnan: int
 
 @dataclass
 class PerVarFrame[AV]:
@@ -64,7 +76,7 @@ class PerVarFrame[AV]:
 @dataclass
 class AState[AV]:
     heap: Dict[int, str]         # abstract heap (addresses -> variable name)
-    constraints: Dict[str, AV]   # variable constraints (variable name -> abstract value) for both state heap and frame locals
+    constraints: Dict[str, any]  # variable constraints (variable name -> abstract value) for both state heap and frame locals
     frames: Stack[PerVarFrame]   # stack of PerVarFrame
 
     def __le__(self, other: "AState") -> bool:
@@ -148,6 +160,7 @@ class AState[AV]:
         # dst = self, src = other - modify in place
         def merge_mapping(dst: Dict[int, str], src: Dict[int, str], location: str) -> None:
             for k, n_other in src.items():
+                if n_other.startswith("arg"): location = "arg"
                 if k in dst:
                     # if dst has the same address, merge
                     dst[k] = resolve_names(dst[k], n_other, location)
@@ -181,67 +194,34 @@ class AState[AV]:
 
         return self
     
-    def __str__(self) -> str:
-        # Heap: show addr: var = abstract_value
-        heap_lines: list[str] = []
-        for addr in sorted(self.heap):
-            var = self.heap[addr]
-            av = self.constraints.get(var, None)
-            if av is None:
-                heap_lines.append(f"    {addr}: {var}")
-            else:
-                heap_lines.append(f"    {addr}: {var} = {av}")
-
-        if not heap_lines:
-            heap_block = "  heap: <empty>"
-        else:
-            heap_block = "  heap:\n" + "\n".join(heap_lines)
-
-        # Constraints: show var -> abstract_value
-        cons_lines: list[str] = []
-        for var in sorted(self.constraints):
-            cons_lines.append(f"    {var}: {self.constraints[var]}")
-        if not cons_lines:
-            cons_block = "  constraints: <empty>"
-        else:
-            cons_block = "  constraints:\n" + "\n".join(cons_lines)
-
-        # Frames: use their own repr/str, one per line
-        frame_lines: list[str] = []
-        for i, f in enumerate(self.frames.items):
-            frame_lines.append(f"    [{i}] {f!r}")
-        if not frame_lines:
-            frames_block = "  frames: <empty>"
-        else:
-            frames_block = "  frames:\n" + "\n".join(frame_lines)
-
-        return "AState(\n" + "\n".join([heap_block, cons_block, frames_block]) + "\n)"     
-        
 
 @dataclass
 class StateSet[AV]:
     per_inst : dict[PC, AState[AV]]
     needswork : set[PC]
 
+    # While there are PCs that need work, we just pick the next one with its corresponding AState
     def per_instruction(self):
         while self.needswork:
             pc = self.needswork.pop()
-            yield (pc, self.per_inst[pc])
+            yield self.per_inst[pc]
 
     # sts |= astate
-    def __ior__(self, astate: AState[AV]):
+    def __ior__(self, astate: AState[AV]):    
         pc = astate.frames.peek().pc
         old = self.per_inst.get(pc)
 
         if old is None:
             # First time seeing this pc
-            self.per_inst[pc] = astate
+            self.per_inst[pc] = astate.clone()
             self.needswork.add(pc)
             return self
         
-        new_state = old.clone()
+        new_state = deepcopy(old)
         new_state |= astate
         
+        # If the working set is changed after ior, the PC still needs work
+        # Otherwise a fixpoint is reached and we do nothing
         if new_state != old:
             self.per_inst[pc] = new_state
             self.needswork.add(pc)
@@ -250,36 +230,126 @@ class StateSet[AV]:
 
 _suite = jpamb.Suite()
 
-def _opcode_at(pc: PC):
-    ops = list(_suite.method_opcodes(pc.method))
-    return ops[pc.offset]
 
 # Step the abstract state (possibly returns more states due to branches)
-def step[AV](state: AState[AV], domain: type[AV], all_ops: list[jvm.Opcode]) -> Iterable[AState[AV] | str]:
-    
-    #logger.debug(f"Currently handling state: {state}")
-    
+def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
     assert isinstance(state, AState), "step expects AState"
     if not state.frames or not state.frames.items:
-        return []  # nothing to do
+        return []
+    
+    def opcode_at(pc: PC):
+        ops = list(_suite.method_opcodes(pc.method))
+        return ops[pc.offset]
 
     frame = state.frames.peek()
     constraints = state.constraints
     pc = frame.pc
-    
-    opr = _opcode_at(pc)
-    
+    opr = opcode_at(pc)
     op_hit.add(opr)
-    
-    logger.debug(f"Current operation: {opr}")
 
     # helper to build successor states (deepcopy to isolate)
-    def mk_successor(new_frame: PerVarFrame, constraints: dict[str, AV]=None) -> AState:
+    def mk_successor(new_frame: PerVarFrame, constraints: dict[str, AV]=None, heap: Dict[int, str]=None) -> AState:
         new_state = deepcopy(state)
         new_state.frames.items[-1] = new_frame  # replace top frame
         if constraints is not None:
             new_state.constraints = constraints
+        if heap is not None:
+            new_state.heap = heap
         return new_state
+    
+    def float_conditional(nf, cmp_res: FloatCmpResult, cond):
+        l_name = cmp_res.left_name
+        r_name = cmp_res.right_name
+        
+        all_rels = cmp_res.possible_rels
+        
+        val_l = constraints[l_name]
+        val_r = constraints[r_name]
+
+        true_rels = {r for r in all_rels if holds(r, cond)}
+        false_rels = all_rels - true_rels
+    
+        # helper: refine 'left_av' for a set of rels by joining constraints
+        def refine_for_rels(rels: set[int]) -> Interval:
+            if not rels:
+                return Interval.empty()
+
+            acc = Interval.empty()
+            for r in rels:
+                if r == -1:
+                    op_name = "lt"
+                elif r == 0:
+                    op_name = "eq"
+                else:  # 1
+                    op_name = "gt"
+
+                t_left, _ = Interval.constrain(val_l, val_r, op_name)
+                
+                acc = acc | t_left
+            return acc
+        
+        targets: list[AState | str] = []
+        
+        # True branch
+        if true_rels:
+            true_frame = deepcopy(nf)
+            new_left_true = refine_for_rels(true_rels)
+            
+            const_true = deepcopy(constraints)
+            const_true[l_name] = new_left_true
+            true_frame.pc = PC(frame.pc.method, opr.target)
+            
+            targets.append(mk_successor(new_frame=true_frame, constraints=const_true))
+            
+
+        # False branch
+        if false_rels:
+            false_frame = deepcopy(nf)
+            new_left_false = refine_for_rels(false_rels)
+            
+            const_false = deepcopy(constraints)
+            const_false[l_name] = new_left_false
+
+            false_frame.pc += 1
+            
+            targets.append(mk_successor(new_frame=false_frame, constraints=const_false))
+        else: op_hit.remove(opr)
+            
+        return targets
+
+    
+    def conditional(nf, n1: str, cond, n2: str = None):
+        if not n2: v2 = domain.abstract([0])
+        else: v2 = constraints[n2]
+        
+        v1 = constraints[n1]
+        
+        if isinstance(v1, FloatCmpResult):
+            states = float_conditional(nf, v1, cond)
+            return states
+        
+        res = v1.compare(v2, cond)
+        c_true, c_false = domain.constrain(v1, v2, cond)
+            
+        targets: list[AState | str] = []
+            
+        if True in res:
+            true_frame = deepcopy(nf)
+            true_const = deepcopy(constraints)
+            true_const[n1] = c_true
+            true_frame.pc = PC(frame.pc.method, opr.target)
+            targets.append(mk_successor(true_frame, true_const))
+            
+        if False in res:
+            false_frame = deepcopy(nf)
+            false_const = deepcopy(constraints)
+            false_const[n1] = c_false
+            false_frame.pc += 1
+            targets.append(mk_successor(false_frame, false_const))
+        else: op_hit.remove(opr)
+        
+        return targets
+
 
     # handle instructions (similar to dynamic interpreter, but on AV)
     match opr:
@@ -287,18 +357,28 @@ def step[AV](state: AState[AV], domain: type[AV], all_ops: list[jvm.Opcode]) -> 
             val_name = f"stack_{len(frame.stack.items)}"
             constraints[val_name] = domain.abstract([v.value])
             
-            frame.stack.push(val_name)
-            frame.pc += 1
+            nf = deepcopy(frame)
             
-            return [state]
+            nf.stack.push(val_name)
+            nf.pc += 1
             
-
+            return [mk_successor(nf, constraints)]
+            
         case jvm.Load(type=t, index=i):
             var_name = frame.locals.get(i)
             
-            frame.stack.push(var_name)
-            frame.pc += 1
-            return [state]
+            nf = deepcopy(frame)
+            
+            nf.stack.push(var_name)
+            
+            if var_name.startswith("local") and i in dead_store.keys():
+                del dead_store[i]
+                
+            if var_name.startswith("arg") and i in dead_arg.keys():
+                del dead_arg[i]
+                
+            nf.pc += 1
+            return [mk_successor(nf)]
 
         case jvm.Dup():
             new_frame = deepcopy(frame)
@@ -307,13 +387,23 @@ def step[AV](state: AState[AV], domain: type[AV], all_ops: list[jvm.Opcode]) -> 
             new_frame.pc += 1
             return [mk_successor(new_frame)]
 
-        case jvm.Binary(type=jvm.Int(), operant=op):
+        case jvm.Binary(type=t, operant=op):
             # pop order preserved: v2 = top, v1 = next
-            n2 = frame.stack.pop()
-            n1 = frame.stack.pop()
+            nf = deepcopy(frame)
+            new_const = deepcopy(constraints)
             
-            v1 = constraints[n1]
-            v2 = constraints[n2]
+            n2 = nf.stack.pop()
+            n1 = nf.stack.pop()
+            
+            if n1.startswith("stack"):
+                v1 = new_const.pop(n1)
+            else:
+                v1 = constraints[n1]
+                
+            if n2. startswith("stack"):
+                v2 = new_const.pop(n2)
+            else:
+                v2 = constraints[n2]
                         
             if op == jvm.BinaryOpr.Add:
                 res = v1.add(v2)
@@ -327,15 +417,18 @@ def step[AV](state: AState[AV], domain: type[AV], all_ops: list[jvm.Opcode]) -> 
                 # Rem and others: over-approximate -> TOP
                 res = domain.top()
             res_name = f"stack_{len(frame.stack.items)}"
-            constraints[res_name] = res
             
-            frame.stack.push(res_name)
-            frame.pc += 1
+            new_const = deepcopy(constraints)
+            new_const[res_name] = res
             
-            return [state]
+            nf.stack.push(res_name)
+            nf.pc += 1
+            
+            return [mk_successor(nf, new_const)]
 
         case jvm.Return(type=t):
             new_state = deepcopy(state)
+            
             top_frame = new_state.frames.pop()
             if t:
                 ret = top_frame.stack.pop()
@@ -357,39 +450,10 @@ def step[AV](state: AState[AV], domain: type[AV], all_ops: list[jvm.Opcode]) -> 
 
         case jvm.Ifz():
             # Compare variable on top of the stack to Zero
-            var_name = frame.stack.pop()
-            print(var_name)
-            v = constraints[var_name]
-            v_zero = domain.abstract([0])
-            cond = opr.condition
-
-            logger.debug(f"Comparing value: {var_name} : {v} {cond} {v_zero}")
-            res = v.compare(v_zero, cond)
-            c_true, c_false = domain.constrain(v, v_zero, cond)
-            
-            logger.debug(f"New constrains for True branch: {c_true}, for False: {c_false}")
-            
-            print(res)
-            
-            targets: list[AState | str] = []
-            
-            if True in res:
-                true_const = deepcopy(constraints)
-                true_const[var_name] = c_true
-                nf = deepcopy(frame)
+            nf = deepcopy(frame)
+            var_name = nf.stack.pop()            
+            targets = conditional(nf=nf, n1=var_name, cond=opr.condition)            
                 
-                nf.pc = PC(frame.pc.method, opr.target)
-                targets.append(mk_successor(nf, true_const))
-            
-            if False in res:
-                false_const = deepcopy(constraints)
-                false_const[var_name] = c_false
-                nf = deepcopy(frame)
-                nf.pc += 1
-                targets.append(mk_successor(nf, false_const))
-            else: op_hit.remove(opr)
-                
-            print(f"Branching targets: {targets}")
             return targets
 
         case jvm.New(offset, classname):
@@ -401,71 +465,169 @@ def step[AV](state: AState[AV], domain: type[AV], all_ops: list[jvm.Opcode]) -> 
             return [mk_successor(new_frame)]
 
         case jvm.If():
-            # two-operand comparison: over-approximate and emit both branches if possible
-            v2 = frame.stack.pop()
-            v1 = frame.stack.pop()
-            cond = opr.condition
-
-            def possible_true():
-                # very conservative: assume true unless impossible for all combinations
-                return True
-
-            targets: list[AState | str] = []
-            if possible_true():
-                nf = deepcopy(frame)
-                nf.pc = PC(frame.pc.method, opr.target)
-                targets.append(mk_successor(nf))
-            # false branch
-            nf2 = deepcopy(frame)
-            nf2.pc += 1
-            targets.append(mk_successor(nf2))
-            return targets
+            # two-operand comparison
+            nf = deepcopy(frame)
+            
+            n2 = nf.stack.pop()
+            n1 = nf.stack.pop()
+            
+            return conditional(nf=nf, n1=n1, cond=opr.condition, n2=n2)
         
         case jvm.Store(index=i):
-            v_name = frame.stack.pop()
+            nf = deepcopy(frame)
+            v_name = nf.stack.pop()
             v = constraints[v_name]
             
-            local_name = frame.locals.get(i)
+            new_const = deepcopy(constraints)
+            
+            local_name = nf.locals.get(i)
+            
             if local_name is None:
                 local_name = f"local_{i}"
-                frame.locals[i] = local_name
-            print(local_name)
-            constraints[local_name] = v
-            frame.pc += 1
+                nf.locals[i] = local_name
             
-            return [state]
+            new_const[local_name] = v
             
+            if not local_name.startswith("arg"):
+                dead_store[i] = opr
             
+            nf.pc += 1
             
-    
+            return [mk_successor(nf, new_const)]
+        
+        case jvm.Goto(target=t):
+            nf = deepcopy(frame)
+            nf.pc = PC(frame.pc.method, t)
+            return [mk_successor(nf)]
+        
+        case jvm.Incr(index=i, amount=a):
+            # Load
+            var_name = frame.locals.get(i)
+            v = constraints[var_name]
+            v_i = domain.abstract([a])
+            
+            # Add
+            res = v.add(v_i)
+            
+            # Store
+            const_upd = deepcopy(constraints)
+            const_upd[var_name] = res
+            
+            new_frame = deepcopy(frame)
+            new_frame.pc += 1
+            
+            return [mk_successor(new_frame=new_frame, constraints=const_upd)]
+        
+        case jvm.NewArray():
+            nf = deepcopy(frame)
+            size_val = nf.stack.pop()
+            size = constraints[size_val]
+            size_conc = size.concrete_value()
+            
+            if size_conc < 0:
+                return "negative size"
+            
+            addr = len(state.heap)
 
-def many_step(state : dict[PC, AState | str]) -> dict[PC, AState | str]:
-  new_state = dict(state)
-  for k, v in state.items():
-      for s in step(v):
-        if isinstance(s, AState):
-            tgt = s.frames.items[0].pc if s.frames.items else k # target pc
-            prev = new_state.get(tgt)
-            if prev is None:
-                new_state[tgt] = s
-            elif isinstance(prev, AState):
-                merged = prev.join(s)  # join with existing state
-                if merged is not None:
-                    new_state[tgt] = merged
-        else:
-            # terminal string outcome (terminal state)
-            new_state[k] = s
-  return new_state
+            new_const = deepcopy(constraints)
+            new_heap = deepcopy(state.heap)
+            
+            arr_name = f"arr_{addr}"
+            new_heap[addr] = arr_name
+            new_const[arr_name] = [addr, size_val]
 
+            nf.stack.push(arr_name)
+            nf.pc += 1
+            
+            return [mk_successor(nf, new_const, new_heap)]
+        
+        
+        case jvm.ArrayStore():
+            nf = deepcopy(frame)
+            
+            value_name = nf.stack.pop()
+            index_name = nf.stack.pop()
+            arrRe_name = nf.stack.pop()
+            
+            value = constraints[value_name]
+            index = constraints[index_name]
+            arrRef = constraints[arrRe_name]
 
-def manystep[AV](sts: StateSet[AV], domain: type[AV], all_ops: list[jvm.Opcode]) -> Iterable[AState[AV] | str]:
+            arr = state.heap[arrRef[0]]
+            
+            elem_name = f"{arr}_{index.concrete_value()}"
+            new_const = deepcopy(constraints)
+            new_const[elem_name] = value
+
+            nf.pc += 1
+            return [mk_successor(new_frame=nf, constraints=new_const)] 
+        
+        
+        case jvm.ArrayLoad():
+            nf = deepcopy(frame)
+            
+            index_name = frame.stack.pop()
+            arr_name = frame.stack.pop()
+
+            index = constraints[index_name].concrete_value()
+            addr = constraints[arr_name][0]
+
+            arr = state.heap[addr]
+
+            name = f"{arr}_{index}"
+            val = constraints[name]
+
+            nf.stack.push(val)
+            nf.pc += 1
+            return [mk_successor(nf)] 
+            
+        case jvm.ArrayLength():
+            nf = deepcopy(frame)
+            
+            arr_name = nf.stack.pop()
+            length = constraints[arr_name][1]
+            
+            nf.stack.push(length)
+            nf.pc += 1
+            return [mk_successor(nf)]
+        
+        case jvm.CompareFloating(type=t, onnan=on):
+            nf = deepcopy(frame)
+            
+            n2 = nf.stack.pop()
+            n1 = nf.stack.pop()
+            
+            v1 = constraints[n1]
+            v2 = constraints[n2]
+            
+            res = v1.compare_floating(v2)
+            
+            cmp_res = FloatCmpResult(
+                left_name=n1,
+                right_name=n2,
+                possible_rels=frozenset(res),
+                onnan=on,
+            )
+            
+            new_const = deepcopy(constraints)
+            new_name = f"stack_{len(nf.stack.items)}"
+                
+            new_const[new_name] = cmp_res
+            res_frame = deepcopy(nf)
+            res_frame.stack.push(new_name)
+            res_frame.pc += 1
+            
+            return [mk_successor(new_frame=res_frame, constraints=new_const)]
+                
+        
+
+def manystep[AV](sts: StateSet[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
     states = []
-    for _pc, state in sts.per_instruction():
-        s = step(state, domain, all_ops)
-        if s is not None:
-            states.extend(s)
+    for state in sts.per_instruction():
+        next_states = step(state, domain)
+        if next_states is not None:
+            states.extend(next_states)
     return states
-
 
 
 def initialstate_from_method[AV](methodid: jvm.AbsMethodID, domain: type[AV]) -> StateSet[AV]:
@@ -475,7 +637,8 @@ def initialstate_from_method[AV](methodid: jvm.AbsMethodID, domain: type[AV]) ->
     constraints = {}
     
     for i, p in enumerate(params):
-        name = f"local_{i}"
+        name = f"arg_{i}"
+        dead_arg[i] = p
         constraints[name] = domain.top()
         start_frame.locals[i] = name
     
@@ -494,43 +657,51 @@ method = jpamb.getmethodid(
     for_science=False
 )
 
+def static_bytecode_analysis(method_list: list[jvm.AbsMethodID]):
+    return 
+
+print(f"MethodId: {method}")
+
 bc = Bytecode(jpamb.Suite(), dict())
 
-sts = initialstate_from_method(method, SignSet)
+DOMAIN = Interval
+
+sts = initialstate_from_method(method, DOMAIN)
 all_ops = list(_suite.method_opcodes(method))
 
 
-
 final = set()
-MAX_STEPS = 100
+unreachable_offset_by_method = dict()
 
-for i in range(MAX_STEPS):
-    for s in manystep(sts, SignSet, all_ops):
+MAX_STEPS = 100
+i = 0
+
+while i < MAX_STEPS and sts.needswork:
+    for s in manystep(sts, DOMAIN):
         if isinstance(s, str):
             final.add(s)
         else:
             sts |= s
+    i += 1
       
-    logger.debug(f"Iteration {i}: {len(sts.needswork)} PCs need work")
-    for pc in sts.needswork:
-        logger.debug(pc)
-    logger.debug(f"Final states: {final}")
+# for op in all_ops:
+#     print(f"{op.offset} -- {op}")
 
-    # If needswork is empty, we've reached fixed point
-    if not sts.needswork:
-        logger.debug("Fixed point reached!")
-        break
-      
-print(f"The following final states {final} is possible in {MAX_STEPS}")
-
-for op in all_ops:
-    print(f"{op.offset} -- {op}")
-
-not_hit = [x for x in all_ops if x not in op_hit]
+not_hit = [idx for idx, x in enumerate(all_ops) if x not in op_hit]
 
 print("NOT HIT")
-for op in not_hit:
-    print(f"{op.offset} -- {op}")
+print(not_hit)
+print(f"DEAD STORE: {dead_store}")
+print(f"DEAD ARG: {dead_arg}")
+
+unreachable_offset_by_method[method.methodid.name] = not_hit
+
+with open("target/decompiled/jpamb/cases/Bloated.json", "r", encoding="utf-8") as f:
+    data = json.load(f)
+    print(dead_indices_to_lines_in_class(data, unreachable_offset_by_method, dead_arg.keys()))
+
+
+
 
 
     

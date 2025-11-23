@@ -59,6 +59,8 @@ class Opcode(ABC):
                 opr = Get
             case "ifz":
                 opr = Ifz
+            case "comparefloating":
+                opr = CompareFloating
             case "cast":
                 opr = Cast
             case "new":
@@ -150,6 +152,16 @@ class Push(Opcode):
             case jvm.Reference():
                 assert self.value.value is None, f"what is {self.value}"
                 return "aconst_null"
+            case jvm.Float():
+                match self.value.value:
+                    case 0:
+                        return "fconst_0"
+                    case 1:
+                        return "fconst_1"
+                    case 2:
+                        return "fconst_2"
+                return f"ldc [{self.value.value}]"
+                
 
         raise NotImplementedError(f"Unhandled {self!r}")
 
@@ -365,6 +377,9 @@ class ArrayLoad(Opcode):
                 return "iaload"
             case jvm.Char():
                 return "caload"
+            # Adding floats to arrays
+            case jvm.Float():
+                return "faload"
 
         return super().real()
 
@@ -666,6 +681,42 @@ class Binary(Opcode):
                 return "imul"
             case (jvm.Int(), BinaryOpr.Sub):
                 return "isub"
+            
+            # float arithmetic
+            case (jvm.Float(), BinaryOpr.Add):
+                return "fadd"
+            case (jvm.Float(), BinaryOpr.Rem):
+                return "frem"
+            case (jvm.Float(), BinaryOpr.Div):
+                return "fdiv"
+            case (jvm.Float(), BinaryOpr.Mul):
+                return "fmul"
+            case (jvm.Float(), BinaryOpr.Sub):
+                return "fsub"
+            
+            # Binary extended for longs
+            case (jvm.Long(), BinaryOpr.Add):
+                return "ladd"
+            case (jvm.Long(), BinaryOpr.Sub):
+                return "lsub"
+            case (jvm.Long(), BinaryOpr.Mul):
+                return "lmul"
+            case (jvm.Long(), BinaryOpr.Div):
+                return "ldiv"
+            case (jvm.Long(), BinaryOpr.Rem):
+                return "lrem"
+            
+            # Binary extended for doubles
+            case (jvm.Double(), BinaryOpr.Add):
+                return "dadd"
+            case (jvm.Double(), BinaryOpr.Sub):
+                return "dsub"
+            case (jvm.Double(), BinaryOpr.Mul):
+                return "dmul"
+            case (jvm.Double(), BinaryOpr.Div):
+                return "ddiv"
+            case (jvm.Double(), BinaryOpr.Rem):
+                return "drem"
         raise NotImplementedError(f"Unhandled real {self!r}")
 
     def semantics(self) -> str | None:
@@ -907,6 +958,86 @@ class Ifz(Opcode):
     def __str__(self):
         return f"ifz {self.condition} {self.target}"
 
+from dataclasses import dataclass
+
+@dataclass(frozen=True, order=True)
+class CompareFloating(Opcode):
+    """
+    Floating-point comparison:
+
+    - Pops two values (value1: type, value2: type) from the operand stack
+    - Compare: value1 ? value2
+    - Pushes an int result:
+        - -1 if value1 < value2
+        -  0 if value1 == value2
+        -  1 if value1 > value2
+        - onnan (either -1 or 1) if either is NaN
+
+    'type' is typically 'float' or 'double'.
+    'onnan' corresponds to JVM's fcmpl/fcmpg or dcmpl/dcmpg behavior.
+    """
+
+    type: str   # "float" or "double"
+    onnan: int  # -1 or 1
+
+    @classmethod
+    def from_json(cls, json: dict) -> "Opcode":
+        return cls(
+            offset=json["offset"],
+            type=json["type"],
+            onnan=json["onnan"],
+        )
+
+    def real(self) -> str:
+        """
+        Map to JVM-like mnemonics:
+
+        For float:
+          onnan == -1 -> fcmpl
+          onnan ==  1 -> fcmpg
+
+        For double:
+          onnan == -1 -> dcmpl
+          onnan ==  1 -> dcmpg
+        """
+        if self.type == "float":
+            if self.onnan == -1:
+                return "fcmpl"
+            elif self.onnan == 1:
+                return "fcmpg"
+        elif self.type == "double":
+            if self.onnan == -1:
+                return "dcmpl"
+            elif self.onnan == 1:
+                return "dcmpg"
+
+        raise ValueError(f"Unsupported floating compare type/onnan: type={self.type}, onnAN={self.onnan}")
+
+    def semantics(self) -> str | None:
+        semantics = f"""
+        bc[i].opr    = 'comparefloating'
+        bc[i].type   = {self.type!r}
+        bc[i].onnan  = {self.onnan}
+
+        -----------------------[comparefloating]
+        bc |- (i, s + [x, y]) -> (i+1, s + [r])
+
+        where:
+          - if x or y is NaN:           r = {self.onnan}
+          - else if x < y:              r = -1
+          - else if x == y:             r = 0
+          - else (x > y):               r = 1
+        """
+        return None
+
+    def mnemonic(self) -> str:
+        # Something readable for disassembly/debug
+        return f"{self.real()} ; onnan={self.onnan}"
+
+    def __str__(self) -> str:
+        return f"comparefloating {self.type} onnan={self.onnan}"
+
+    
 
 @dataclass(frozen=True, order=True)
 class New(Opcode):

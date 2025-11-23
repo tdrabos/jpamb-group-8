@@ -285,7 +285,7 @@
       },
       "default": null,
       "exceptions": [],
-      "name": "unreachableBranchSign",
+      "name": "unreachableBranchBasic",
       "params": [
         {
           "annotations": [],
@@ -300,6 +300,1421 @@
         "annotations": [],
         "type": {
           "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "offset": 0,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "index": 0,
+            "offset": 1,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 2,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 3,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 26,
+            "offset": 0
+          },
+          {
+            "line": 28,
+            "offset": 2
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 1,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "localInitButNotUsed",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "ne",
+            "offset": 1,
+            "opr": "ifz",
+            "target": 6
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "index": 0,
+            "offset": 5,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 6,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "offset": 7,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "offset": 8,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "index": 1,
+            "offset": 9,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 10,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 11,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "condition": "ge",
+            "offset": 12,
+            "opr": "if",
+            "target": 23
+          },
+          {
+            "amount": 1,
+            "index": 0,
+            "offset": 15,
+            "opr": "incr"
+          },
+          {
+            "index": 1,
+            "offset": 18,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 19,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "condition": "ne",
+            "offset": 20,
+            "opr": "if",
+            "target": 21
+          },
+          {
+            "index": 0,
+            "offset": 23,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 24,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 25,
+            "operant": "sub",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 26,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 27,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 28,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "amount": 1,
+            "index": 1,
+            "offset": 29,
+            "opr": "incr"
+          },
+          {
+            "offset": 32,
+            "opr": "goto",
+            "target": 8
+          },
+          {
+            "offset": 35,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 36,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 32,
+            "offset": 0
+          },
+          {
+            "line": 33,
+            "offset": 2
+          },
+          {
+            "line": 36,
+            "offset": 6
+          },
+          {
+            "line": 37,
+            "offset": 11
+          },
+          {
+            "line": 38,
+            "offset": 12
+          },
+          {
+            "line": 39,
+            "offset": 15
+          },
+          {
+            "line": 40,
+            "offset": 19
+          },
+          {
+            "line": 36,
+            "offset": 21
+          },
+          {
+            "line": 43,
+            "offset": 23
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 2,
+        "stack_map": [
+          {
+            "index": 6,
+            "type": "same"
+          },
+          {
+            "index": 8,
+            "info": [
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "append_frame"
+          },
+          {
+            "index": 21,
+            "type": "same"
+          },
+          {
+            "index": 23,
+            "info": 1,
+            "type": "chop_frame"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unreachableBranchFor",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "int"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "ne",
+            "offset": 1,
+            "opr": "ifz",
+            "target": 6
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "index": 0,
+            "offset": 5,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 6,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "offset": 7,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "offset": 8,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "index": 1,
+            "offset": 9,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 10,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 11,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "condition": "ge",
+            "offset": 12,
+            "opr": "if",
+            "target": 23
+          },
+          {
+            "amount": 1,
+            "index": 0,
+            "offset": 15,
+            "opr": "incr"
+          },
+          {
+            "index": 1,
+            "offset": 18,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 19,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "condition": "ne",
+            "offset": 20,
+            "opr": "if",
+            "target": 21
+          },
+          {
+            "index": 0,
+            "offset": 23,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 24,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 25,
+            "operant": "sub",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 26,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 27,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 28,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "amount": 1,
+            "index": 1,
+            "offset": 29,
+            "opr": "incr"
+          },
+          {
+            "offset": 32,
+            "opr": "goto",
+            "target": 8
+          },
+          {
+            "offset": 35,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 36,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 47,
+            "offset": 0
+          },
+          {
+            "line": 48,
+            "offset": 2
+          },
+          {
+            "line": 51,
+            "offset": 6
+          },
+          {
+            "line": 52,
+            "offset": 11
+          },
+          {
+            "line": 53,
+            "offset": 12
+          },
+          {
+            "line": 54,
+            "offset": 15
+          },
+          {
+            "line": 55,
+            "offset": 19
+          },
+          {
+            "line": 51,
+            "offset": 21
+          },
+          {
+            "line": 58,
+            "offset": 23
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 2,
+        "stack_map": [
+          {
+            "index": 6,
+            "type": "same"
+          },
+          {
+            "index": 8,
+            "info": [
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "append_frame"
+          },
+          {
+            "index": 21,
+            "type": "same"
+          },
+          {
+            "index": 23,
+            "info": 1,
+            "type": "chop_frame"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unreachableBranchWhile",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "int"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "le",
+            "offset": 1,
+            "opr": "ifz",
+            "target": 36
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 5
+            }
+          },
+          {
+            "dim": 1,
+            "offset": 5,
+            "opr": "newarray",
+            "type": "int"
+          },
+          {
+            "offset": 7,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 8,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 9,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "offset": 10,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 11,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 12,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "offset": 13,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 14,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 15,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 16,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 17,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 3
+            }
+          },
+          {
+            "offset": 18,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 19,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 20,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 3
+            }
+          },
+          {
+            "offset": 21,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "offset": 22,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 23,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 24,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "offset": 25,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 5
+            }
+          },
+          {
+            "offset": 26,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 27,
+            "opr": "store",
+            "type": "ref"
+          },
+          {
+            "index": 1,
+            "offset": 28,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "offset": 29,
+            "opr": "arraylength"
+          },
+          {
+            "offset": 30,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 5
+            }
+          },
+          {
+            "condition": "le",
+            "offset": 31,
+            "opr": "if",
+            "target": 32
+          },
+          {
+            "amount": 1,
+            "index": 0,
+            "offset": 34,
+            "opr": "incr"
+          },
+          {
+            "index": 0,
+            "offset": 37,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 38,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 39,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "offset": 40,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 41,
+            "opr": "array_load",
+            "type": "int"
+          },
+          {
+            "offset": 42,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "offset": 43,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 44,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 62,
+            "offset": 0
+          },
+          {
+            "line": 63,
+            "offset": 2
+          },
+          {
+            "line": 65,
+            "offset": 25
+          },
+          {
+            "line": 66,
+            "offset": 29
+          },
+          {
+            "line": 67,
+            "offset": 30
+          },
+          {
+            "line": 70,
+            "offset": 32
+          },
+          {
+            "line": 73,
+            "offset": 36
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 4,
+        "stack_map": [
+          {
+            "index": 32,
+            "info": [
+              {
+                "ref": {
+                  "kind": "array",
+                  "type": "int"
+                },
+                "type": "object"
+              }
+            ],
+            "type": "append_frame"
+          },
+          {
+            "index": 36,
+            "info": 1,
+            "type": "chop_frame"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unreachableBranchArray",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "int"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "offset": 0,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 1,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 77,
+            "offset": 0
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 1,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "deadArg",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "int"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "offset": 0,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "index": 0,
+            "offset": 1,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 2,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "offset": 3,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 81,
+            "offset": 0
+          },
+          {
+            "line": 83,
+            "offset": 2
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 1,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "deadStore",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "offset": 0,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "dim": 1,
+            "offset": 1,
+            "opr": "newarray",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 3,
+            "opr": "store",
+            "type": "ref"
+          },
+          {
+            "index": 1,
+            "offset": 4,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "offset": 5,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 6,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 42
+            }
+          },
+          {
+            "offset": 8,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 9,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "offset": 10,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 11,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "offset": 12,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 13,
+            "opr": "return",
+            "type": null
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 87,
+            "offset": 0
+          },
+          {
+            "line": 88,
+            "offset": 3
+          },
+          {
+            "line": 89,
+            "offset": 7
+          },
+          {
+            "line": 90,
+            "offset": 11
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 3,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "keepObservableArrayWrite",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "kind": "array",
+            "type": {
+              "annotations": [],
+              "base": "int"
+            }
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 1,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 0
+            }
+          },
+          {
+            "offset": 2,
+            "onnan": 1,
+            "opr": "comparefloating",
+            "type": "float"
+          },
+          {
+            "condition": "ne",
+            "offset": 3,
+            "opr": "ifz",
+            "target": 8
+          },
+          {
+            "offset": 6,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 1.5
+            }
+          },
+          {
+            "index": 0,
+            "offset": 8,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 9,
+            "operant": "add",
+            "opr": "binary",
+            "type": "float"
+          },
+          {
+            "offset": 10,
+            "opr": "return",
+            "type": "float"
+          },
+          {
+            "index": 0,
+            "offset": 11,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 12,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 0
+            }
+          },
+          {
+            "offset": 13,
+            "onnan": 1,
+            "opr": "comparefloating",
+            "type": "float"
+          },
+          {
+            "condition": "le",
+            "offset": 14,
+            "opr": "ifz",
+            "target": 25
+          },
+          {
+            "index": 0,
+            "offset": 17,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 18,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 2
+            }
+          },
+          {
+            "offset": 19,
+            "operant": "add",
+            "opr": "binary",
+            "type": "float"
+          },
+          {
+            "index": 0,
+            "offset": 20,
+            "opr": "store",
+            "type": "float"
+          },
+          {
+            "index": 0,
+            "offset": 21,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 22,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 0
+            }
+          },
+          {
+            "offset": 23,
+            "onnan": 1,
+            "opr": "comparefloating",
+            "type": "float"
+          },
+          {
+            "condition": "ne",
+            "offset": 24,
+            "opr": "ifz",
+            "target": 23
+          },
+          {
+            "offset": 27,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "index": 1,
+            "offset": 28,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "amount": 1,
+            "index": 1,
+            "offset": 29,
+            "opr": "incr"
+          },
+          {
+            "offset": 32,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 1
+            }
+          },
+          {
+            "offset": 33,
+            "opr": "return",
+            "type": "float"
+          },
+          {
+            "offset": 34,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 0
+            }
+          },
+          {
+            "offset": 35,
+            "opr": "return",
+            "type": "float"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 93,
+            "offset": 0
+          },
+          {
+            "line": 94,
+            "offset": 4
+          },
+          {
+            "line": 97,
+            "offset": 8
+          },
+          {
+            "line": 98,
+            "offset": 12
+          },
+          {
+            "line": 100,
+            "offset": 16
+          },
+          {
+            "line": 101,
+            "offset": 20
+          },
+          {
+            "line": 102,
+            "offset": 22
+          },
+          {
+            "line": 105,
+            "offset": 23
+          },
+          {
+            "line": 107,
+            "offset": 25
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 2,
+        "stack_map": [
+          {
+            "index": 8,
+            "type": "same"
+          },
+          {
+            "index": 23,
+            "type": "same"
+          },
+          {
+            "index": 25,
+            "type": "same"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unreachableBranchBasicFloat",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "float"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "float"
         }
       },
       "typeparams": []
