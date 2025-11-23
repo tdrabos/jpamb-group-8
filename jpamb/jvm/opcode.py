@@ -965,6 +965,7 @@ class If(Opcode):
     """
 
     condition: str  # One of the CmpOpr values
+    type: jvm.Type
     target: int  # Jump target offset
 
     @classmethod
@@ -991,12 +992,59 @@ class If(Opcode):
         # For reference comparisons - this handles arrays for if statement
         ref_cmp_map = {"is": "if_acmpeq", "isnot": "if_acmpne"}
 
-        if self.condition in int_cmp_map:
-            return f"{int_cmp_map[self.condition]} {self.target}"
-        elif self.condition in ref_cmp_map:
-            return f"{ref_cmp_map[self.condition]} {self.target}"
-        else:
-            raise ValueError(f"Unknown comparison condition: {self.condition}")
+        #for floats
+        float_cmp_map = {
+            "eq": ("fcmpl", "ifeq"),
+            "ne": ("fcmpl", "ifne"),
+            "lt": ("fcmpl","iflt"),
+            "ge": ("fcmpl","ifge"),
+            "gt": ("fcmpl","ifgt"),
+            "le": ("fcmpl","ifle"),
+        }
+
+        #for doubles
+        doubles_cmp_map = {
+            "eq": ("dcmpl", "ifeq"),
+            "ne": ("dcmpl", "ifne"),
+            "lt": ("dcmpl","iflt"),
+            "ge": ("dcmpl","ifge"),
+            "gt": ("dcmpl","ifgt"),
+            "le": ("dcmpl","ifle"),
+        }
+        
+        # for longs
+        long_cmp_map = {
+            "eq": ("ifeq"),
+            "ne": ("ifne"),
+            "lt": ("iflt"),
+            "ge": ("ifge"),
+            "gt": ("ifgt"),
+            "le": ("ifle"),
+        }
+        match self.type:
+            case jvm.Int():
+                return f"{int_cmp_map[self.condition]} {self.target}"
+            case jvm.Reference():
+                return f"{ref_cmp_map[self.condition]} {self.target}"
+            # Support for floats
+            case jvm.Float():
+                cmp_instr, branch = float_cmp_map[self.condition]
+                return f"{cmp_instr}; {branch} {self.target}"
+            # Support for doubles
+            case jvm.Double():
+                cmp_instr, branch = doubles_cmp_map[self.condition]
+                return f"{cmp_instr}; {branch} {self.target}"     
+            #support for longs 
+            case jvm.Long():
+                branch = long_cmp_map[self.condition] 
+                return ["lcmp", f"{branch} {self.target}"]      
+        raise ValueError(f"Unsupported type {self.type} for If") 
+        # if self.condition in int_cmp_map:
+        #     return f"{int_cmp_map[self.condition]} {self.target}"
+        # elif self.condition in ref_cmp_map:
+        #     return f"{ref_cmp_map[self.condition]} {self.target}"
+        # else:
+        #     raise ValueError(f"Unknown comparison condition: {self.condition}")
 
     def semantics(self) -> str | None:
         semantics = """
@@ -1094,6 +1142,7 @@ class Ifz(Opcode):
     """
 
     condition: str  # One of the CmpOpr values
+    type: jvm.Type
     target: int  # Jump target offset
 
     @classmethod
@@ -1120,12 +1169,58 @@ class Ifz(Opcode):
             "isnot": "ifnonnull",  # value != null
         }
 
-        if self.condition in int_cmp_map:
-            return f"{int_cmp_map[self.condition]} {self.target}"
-        elif self.condition in ref_cmp_map:
-            return f"{ref_cmp_map[self.condition]} {self.target}"
-        else:
-            raise ValueError(f"Unknown comparison condition: {self.condition}")
+        #for floats
+        float_cmp_map = {
+            "eq": "fcmpl",
+            "ne": "fcmpl",
+            "lt": "fcmpl",
+            "ge": "fcmpl",
+            "gt": "fcmpl",
+            "le": "fcmpl",
+        }
+
+        #for doubles
+        doubles_cmp_map = {
+            "eq": "dcmpl",
+            "ne": "dcmpl",
+            "lt": "dcmpl",
+            "ge": "dcmpl",
+            "gt": "dcmpl",
+            "le": "dcmpl",
+        }
+
+        # for longs
+        long_cmp_map = {
+            "eq": ("ifeq"),
+            "ne": ("ifne"),
+            "lt": ("iflt"),
+            "ge": ("ifge"),
+            "gt": ("ifgt"),
+            "le": ("ifle"),
+        }
+
+        match self.type:
+            case jvm.Int():
+                return f"{int_cmp_map[self.condition]} {self.target}"
+            case jvm.Reference():
+                return f"{ref_cmp_map[self.condition]} {self.target}"
+            #Support for floats
+            case jvm.Float():
+                return f"{float_cmp_map[self.condition]} {self.target}"
+            # Support for doubles
+            case jvm.Double():
+                return f"{doubles_cmp_map[self.condition]} {self.target}"
+            #support for longs
+            case jvm.Long():
+                branch = long_cmp_map[self.condition]
+                return ["lconst_0", "lcmp", f"{branch}"]
+        raise ValueError(f"Unknown comparision condition: {self.condition}")
+        # if self.condition in int_cmp_map:
+        #     return f"{int_cmp_map[self.condition]} {self.target}"
+        # elif self.condition in ref_cmp_map:
+        #     return f"{ref_cmp_map[self.condition]} {self.target}"
+        # else:
+        #     raise ValueError(f"Unknown comparison condition: {self.condition}")
 
     def semantics(self) -> str | None:
         semantics = """

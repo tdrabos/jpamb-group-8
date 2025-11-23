@@ -514,14 +514,15 @@ def step(state: State) -> State | str:
                         jump = (v1.value != v2.value)
                     case _:
                         raise NotImplementedError(f"Unknown ref condition: {cond}")
-            else:
+            
                     
-                assert v1.type is jvm.Int(), f"expected int, but got {v1}"
-                assert v2.type is jvm.Int(), f"expected int, but got {v2}"
+                # assert v1.type is jvm.Int(), f"expected int, but got {v1}"
+                # assert v2.type is jvm.Int(), f"expected int, but got {v2}"
 
-                assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
-                assert v2.type is jvm.Boolean(), f"expected bool, but got {v2}"
+                # assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
+                # assert v2.type is jvm.Boolean(), f"expected bool, but got {v2}"
 
+            elif isinstance(v1.type, (jvm.Int, jvm.Boolean, jvm.Float, jvm.Double, jvm.Long))
                 match cond:
                     case "eq": jump = (v1.value == v2.value)
                     case "ne": jump = (v1.value != v2.value)
@@ -550,7 +551,7 @@ def step(state: State) -> State | str:
                     case _:
                         raise NotImplementedError(f"Unknown condition: {cond}")
             
-            else:        
+            elif isinstance(v1.type, (jvm.Int, jvm.Boolean, jvm.Float, jvm.Double, jvm.Long))        
                 assert v1.type is jvm.Int(), f"expected int, but got {v1}"
                 assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
 
