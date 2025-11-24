@@ -649,56 +649,54 @@ def initialstate_from_method[AV](methodid: jvm.AbsMethodID, domain: type[AV]) ->
         needswork={start_frame.pc}
     )
 
-method = jpamb.getmethodid(
-    "Bounded Static Analysis",
-    "1.0",
-    "Group8",
-    [],
-    for_science=False
-)
-
-def static_bytecode_analysis(method_list: list[jvm.AbsMethodID]):
-    return 
-
-print(f"MethodId: {method}")
-
-bc = Bytecode(jpamb.Suite(), dict())
+# ------- ANALYSIS BEGIN ---------
 
 DOMAIN = Interval
+bc = Bytecode(jpamb.Suite(), dict())
 
-sts = initialstate_from_method(method, DOMAIN)
-all_ops = list(_suite.method_opcodes(method))
+def static_bytecode_analysis(method_list: list[jvm.AbsMethodID]):
+    
+    logger.debug(f"Starting Bytecode Analysis...")
+    
+    unreachable_offset_by_method = dict()
+    
+    for method in method_list:
+        logger.debug(f"Currently analysing method: {method.extension.name}")
+        
+        sts = initialstate_from_method(method, DOMAIN)
+        all_ops = list(_suite.method_opcodes(method))
+        
+        final = set()
+        
+        # Unbounded Static Analysis
+        while sts.needswork:
+            for s in manystep(sts, DOMAIN):
+                if isinstance(s, str):
+                    final.add(s)
+                else:
+                    sts |= s
+                    
+        not_hit = [idx for idx, x in enumerate(all_ops) if x not in op_hit]
+
+        
+        print(f"DEAD STORE: {dead_store}")
+        print(f"DEAD ARG: {dead_arg}")
+        
+        for k, v in dead_store:
+            not_hit.append(v)
+        
+        print("NOT HIT")
+        print(not_hit)
+
+        unreachable_offset_by_method[method.methodid.name] = not_hit
+        
+    with open("target/decompiled/jpamb/cases/Bloated.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+        json_data = dead_indices_to_lines_in_class(data, unreachable_offset_by_method, dead_arg.keys())
+        
+        return json_data
 
 
-final = set()
-unreachable_offset_by_method = dict()
-
-MAX_STEPS = 100
-i = 0
-
-while i < MAX_STEPS and sts.needswork:
-    for s in manystep(sts, DOMAIN):
-        if isinstance(s, str):
-            final.add(s)
-        else:
-            sts |= s
-    i += 1
-      
-# for op in all_ops:
-#     print(f"{op.offset} -- {op}")
-
-not_hit = [idx for idx, x in enumerate(all_ops) if x not in op_hit]
-
-print("NOT HIT")
-print(not_hit)
-print(f"DEAD STORE: {dead_store}")
-print(f"DEAD ARG: {dead_arg}")
-
-unreachable_offset_by_method[method.methodid.name] = not_hit
-
-with open("target/decompiled/jpamb/cases/Bloated.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-    print(dead_indices_to_lines_in_class(data, unreachable_offset_by_method, dead_arg.keys()))
 
 
 
