@@ -161,8 +161,94 @@ class Push(Opcode):
                     case 2:
                         return "fconst_2"
                 return f"ldc [{self.value.value}]"
-                
+            # Handle Booleans
+            case jvm.Boolean():
+                return "iconst_1" if self.value.value else "iconst_0"                     
+            # Handle Longs
+            case jvm.Long():
+                match self.value.value:
+                    case 0:
+                        return "lconfig_0"
+                    case 1:
+                        return 'lconfig_1'
+                return f"ldc2_w [{self.value.value}]"
+            # Handle Doubles 
+            case jvm.Double():
+                match self.value.value:
+                    case 0:
+                        return "dconfig_0"
+                    case 1:
+                        return "dconfig_1"
+                return f"ldc2_w [{self.value.value}]"
+            #Handle Bytes
+            case jvm.Byte():
+                b = self.value.value
+                match b:
+                    case -1:
+                        return "iconst_m1"
+                    case 0:
+                        return "iconst_0"
+                    case 1:
+                        return "iconst_1"
+                    case 2:
+                        return "iconst_2"
+                    case 3:
+                        return "iconst_3"
+                    case 4:
+                        return "iconst_4"
+                    case 5:
+                        return "iconst_5"
 
+                if -128 <= b <= 127:
+                    return f"bipush {b}" 
+                return f"ldc [{b}]"
+            # Handle shorts
+            case jvm.Short():
+                s = self.value.value
+                match s:
+                    case -1:
+                        return "iconst_m1"
+                    case 0:
+                        return "iconst_0"
+                    case 1:
+                        return "iconst_1"
+                    case 2:
+                        return "iconst_2"
+                    case 3:
+                        return "iconst_3"
+                    case 4:
+                        return "iconst_4"
+                    case 5:
+                        return "iconst_5"
+                if -128 <= s <= 127:
+                    return f"bipush {s}"
+                if -32768 <= s <= 32767:
+                    return f"sipush {s}"
+                return f"ldc [{s}]"
+            # Handle char
+            case jvm.Char():
+                c = self.value.value
+                match c:
+                    case 0:
+                        return "iconst_0"
+                    case 1:
+                        return "iconst_1"
+                    case 2:
+                        return "iconst_2"
+                    case 3:
+                        return "iconst_3"
+                    case 4:
+                        return "iconst_4"
+                    case 5:
+                        return "iconst_5"
+                
+                if 0 <= c <= 127:
+                    return f"bipush {c}"
+                
+                if 0 <= c <= 65535:
+                    return f"sipush {c}"
+                return f"ldc [{c}]"
+                            
         raise NotImplementedError(f"Unhandled {self!r}")
 
     def semantics(self) -> str | None:
@@ -184,11 +270,60 @@ class Push(Opcode):
                     return "ldc"
             case jvm.Reference():
                 return "aconst_null"
+            # Handle Bools
+            case jvm.Boolean():
+                return "iconst_1" if self.value.value else "iconst_0"
+            # Handle Float
+            case jvm.Float():
+                if self.value.value in (0.0, 1.0, 2.0):
+                    return "fconst"
+                return "ldc"
+            # Handle Longs
+            case jvm.Long():
+                if self.value.value in (0, 1):
+                    return "lconst" 
+                else:
+                    return "ldc2_w" #believe this is the right one to use 
+            # Handle Doubles 
+            case jvm.Double():
+                if self.value.value in (0, 1):
+                    return "dconst"
+                else:
+                    return "ldc2_w"  
+            # Handle bytes
+            case jvm.Byte():
+                b = self.value.value
+                if -1 <= b <= 5:
+                    return "iconst"
+                if -128 <= b <= 127:
+                    return "bipush"
+                return "ldc"
+            # Handle shorts 
+            case jvm.Short():
+                s = self.value.value
+                if -1 <= s <= 5:
+                    return "iconst"
+                if -128 <= s <= 127:
+                    return "bipush"
+                if -32768 <= s <= 32767:
+                    return "sipush"
+                return "ldc"
+            #Handle Char
+            case jvm.Char():
+                c = self.value.value
+                if 0 <= c <=5:
+                    return "iconst"
+                if 0 <= c <= 65535:
+                    return "sipush"
+                return "ldc"
+
+                    
 
         raise NotImplementedError(f"Unhandled {self!r}")
 
     def __str__(self):
         return f"push:{self.value.type} {self.value.value}"
+#        return f""
 
 
 @dataclass(frozen=True, order=True)
@@ -309,6 +444,23 @@ class ArrayStore(Opcode):
                 return "aastore"
             case jvm.Int():
                 return "iastore"
+            case jvm.Boolean():
+                return "bastore"
+            # Adding bytes to arrays
+            case jvm.Byte():
+                return "bastore"
+            # Adding shorts to arrays
+            case jvm.Short():
+                return "sastore"
+            # Adding floats for arrays
+            case jvm.Float():
+                return "fastore"
+            # Adding longs for arrays
+            case jvm.Long():
+                return "lastore"
+            # Adding doubles for arrays
+            case jvm.Double():
+                return "dastore"
 
         return super().real()
 
@@ -377,9 +529,23 @@ class ArrayLoad(Opcode):
                 return "iaload"
             case jvm.Char():
                 return "caload"
+            case jvm.Boolean():
+                return "baload"
+            # adding bytes to arrays
+            case jvm.Byte():
+                return "baload"
+            # adding shorts to arrays
+            case jvm.Short():
+                return "saload"
             # Adding floats to arrays
             case jvm.Float():
                 return "faload"
+            # Adding longs to arrays
+            case jvm.Long():
+                return "laload"
+            # Adding doubles to arrays
+            case jvm.Double():
+                return "daload"
 
         return super().real()
 
@@ -427,7 +593,7 @@ class ArrayLength(Opcode):
         return "arraylength"
 
 
-@dataclass(frozen=True, order=True)  # make it work for
+@dataclass(frozen=True, order=True)
 class InvokeVirtual(Opcode):
     """The invoke virtual opcode for calling instance methods"""
 
@@ -607,6 +773,18 @@ class Store(Opcode):
         # Handle integer type
         elif isinstance(self.type, jvm.Int):
             return f"istore_{self.index}" if self.index < 4 else f"istore {self.index}"
+        # Handle boolean type 
+        elif isinstance(self.type, jvm.Boolean):
+            return f"istore_{self.index}" if self.index < 4 else f"istore {self.index}"
+        # Handle float type 
+        elif isinstance(self.type, jvm.Float):
+            return f"fstore_{self.index}" if self.index < 4 else f"fstore {self.index}"
+        # Handle long type
+        elif isinstance(self.type, jvm.Long):
+            return f"lstore_{self.index}" if self.index < 4 else f"lstore {self.index}"
+        # Handle double type 
+        elif isinstance(self.type, jvm.Double):
+            return f"dstore_{self.index}" if self.index < 4 else f"dstore {self.index}"
         return super().real()
 
     def semantics(self) -> str | None:
@@ -618,6 +796,18 @@ class Store(Opcode):
         # Handle integer type
         elif isinstance(self.type, jvm.Int):
             return "istore_n" if self.index < 4 else "istore"
+        # Handle boolean type
+        elif isinstance(self.type, jvm.Boolean):
+            return "istore_n" if self.index < 4 else "istore"
+        # Handle float type
+        elif isinstance(self.type, jvm.Float):
+            return "fstore_n" if self.index < 4 else "fstore"
+        # Handle long type
+        elif isinstance(self.type, jvm.Long):
+            return "lstore_n" if self.index < 4 else "lstore"
+        # Handle double type 
+        elif isinstance(self.type, jvm.Double):
+            return "dstore_n" if self.index < 4 else "dstore"
         return ""
 
         return self.real()
@@ -645,7 +835,7 @@ class BinaryOpr(enum.Enum):
             case "div":
                 return BinaryOpr.Div
             case "rem":
-                return BinaryOpr.Rem
+                return BinaryOpr.Rem         
             case _:
                 raise NotImplementedError()
 
@@ -681,19 +871,17 @@ class Binary(Opcode):
                 return "imul"
             case (jvm.Int(), BinaryOpr.Sub):
                 return "isub"
-            
-            # float arithmetic
+            #Binary extended for floats
             case (jvm.Float(), BinaryOpr.Add):
-                return "fadd"
-            case (jvm.Float(), BinaryOpr.Rem):
-                return "frem"
-            case (jvm.Float(), BinaryOpr.Div):
-                return "fdiv"
-            case (jvm.Float(), BinaryOpr.Mul):
-                return "fmul"
+                return 'fadd'
             case (jvm.Float(), BinaryOpr.Sub):
                 return "fsub"
-            
+            case (jvm.Float(), BinaryOpr.Mul):
+                return "fmul"
+            case (jvm.Float(), BinaryOpr.Div):
+                return "fdiv"
+            case (jvm.Float(), BinaryOpr.Rem):
+                return "frem"   
             # Binary extended for longs
             case (jvm.Long(), BinaryOpr.Add):
                 return "ladd"
@@ -705,7 +893,6 @@ class Binary(Opcode):
                 return "ldiv"
             case (jvm.Long(), BinaryOpr.Rem):
                 return "lrem"
-            
             # Binary extended for doubles
             case (jvm.Double(), BinaryOpr.Add):
                 return "dadd"
@@ -748,8 +935,21 @@ class Load(Opcode):
         # Handle integer type
         elif isinstance(self.type, jvm.Int):
             return f"iload_{self.index}" if self.index < 4 else f"iload {self.index}"
+        # Handle boolean typ
+        elif isinstance(self.type, jvm.Boolean):
+            return f"iload_{self.index}" if self.index < 4 else f"iload {self.index}"
+        #Handle float type
+        elif isinstance(self.type, jvm.Float):
+            return f"fload_{self.index}" if self.index < 4 else f"fload {self.index}"
+        # Handle long type
+        elif isinstance(self.type, jvm.Long):
+            return f"lload_{self.index}" if self.index < 4 else f"lload {self.index}"
+        # Handle double type
+        elif isinstance(self.type, jvm.Double):
+            return f"dload_{self.index}" if self.index < 4 else f"dload {self.index}"
         return super().real()
 
+        
     def semantics(self) -> str | None:
         return None
 
@@ -759,6 +959,18 @@ class Load(Opcode):
         # Handle integer type
         elif isinstance(self.type, jvm.Int):
             return "iload_n" if self.index < 4 else "iload"
+        # Handle boolean type
+        elif isinstance(self.type, jvm.Boolean):
+            return "iload_n" if self.index < 4 else "iload"
+        # Handle float type 
+        elif isinstance(self.type, jvm.Float):
+            return "fload_n" if self.index < 4 else "fload"
+        # Hanlde long type 
+        elif isinstance(self.type, jvm.Long):
+            return "lload_n" if self.index < 4 else "lload"
+        # Handle double type
+        elif isinstance(self.type, jvm.Double):
+            return "dload_n" if self.index < 4 else "dload"
         return ""
 
     def __str__(self):
@@ -781,6 +993,7 @@ class If(Opcode):
     """
 
     condition: str  # One of the CmpOpr values
+    type: jvm.Type
     target: int  # Jump target offset
 
     @classmethod
@@ -800,16 +1013,66 @@ class If(Opcode):
             "gt": "if_icmpgt",
             "le": "if_icmple",
         }
+        #floats dont have branching but can compare through if_fcmp<op> which will push an int after comparison
+        # or i can make a comparison in BinaryOpr using fcmpg and fcmpl from fcmp<op>
+        # same case for longs and doubles
 
-        # For reference comparisons
+        # For reference comparisons - this handles arrays for if statement
         ref_cmp_map = {"is": "if_acmpeq", "isnot": "if_acmpne"}
 
-        if self.condition in int_cmp_map:
-            return f"{int_cmp_map[self.condition]} {self.target}"
-        elif self.condition in ref_cmp_map:
-            return f"{ref_cmp_map[self.condition]} {self.target}"
-        else:
-            raise ValueError(f"Unknown comparison condition: {self.condition}")
+        #for floats
+        float_cmp_map = {
+            "eq": ("fcmpl", "ifeq"),
+            "ne": ("fcmpl", "ifne"),
+            "lt": ("fcmpl","iflt"),
+            "ge": ("fcmpl","ifge"),
+            "gt": ("fcmpl","ifgt"),
+            "le": ("fcmpl","ifle"),
+        }
+
+        #for doubles
+        doubles_cmp_map = {
+            "eq": ("dcmpl", "ifeq"),
+            "ne": ("dcmpl", "ifne"),
+            "lt": ("dcmpl","iflt"),
+            "ge": ("dcmpl","ifge"),
+            "gt": ("dcmpl","ifgt"),
+            "le": ("dcmpl","ifle"),
+        }
+        
+        # for longs
+        long_cmp_map = {
+            "eq": ("ifeq"),
+            "ne": ("ifne"),
+            "lt": ("iflt"),
+            "ge": ("ifge"),
+            "gt": ("ifgt"),
+            "le": ("ifle"),
+        }
+        match self.type:
+            case jvm.Int():
+                return f"{int_cmp_map[self.condition]} {self.target}"
+            case jvm.Reference():
+                return f"{ref_cmp_map[self.condition]} {self.target}"
+            # Support for floats
+            case jvm.Float():
+                cmp_instr, branch = float_cmp_map[self.condition]
+                return f"{cmp_instr}; {branch} {self.target}"
+            # Support for doubles
+            case jvm.Double():
+                cmp_instr, branch = doubles_cmp_map[self.condition]
+                return f"{cmp_instr}; {branch} {self.target}"     
+            #support for longs 
+            case jvm.Long():
+                branch = long_cmp_map[self.condition] 
+                return ["lcmp", f"{branch} {self.target}"]      
+        raise ValueError(f"Unsupported type {self.type} for If") 
+        # if self.condition in int_cmp_map:
+        #     return f"{int_cmp_map[self.condition]} {self.target}"
+        # elif self.condition in ref_cmp_map:
+        #     return f"{ref_cmp_map[self.condition]} {self.target}"
+        # else:
+        #     raise ValueError(f"Unknown comparison condition: {self.condition}")
 
     def semantics(self) -> str | None:
         semantics = """
@@ -907,6 +1170,7 @@ class Ifz(Opcode):
     """
 
     condition: str  # One of the CmpOpr values
+    type: jvm.Type
     target: int  # Jump target offset
 
     @classmethod
@@ -933,12 +1197,58 @@ class Ifz(Opcode):
             "isnot": "ifnonnull",  # value != null
         }
 
-        if self.condition in int_cmp_map:
-            return f"{int_cmp_map[self.condition]} {self.target}"
-        elif self.condition in ref_cmp_map:
-            return f"{ref_cmp_map[self.condition]} {self.target}"
-        else:
-            raise ValueError(f"Unknown comparison condition: {self.condition}")
+        #for floats
+        float_cmp_map = {
+            "eq": "fcmpl",
+            "ne": "fcmpl",
+            "lt": "fcmpl",
+            "ge": "fcmpl",
+            "gt": "fcmpl",
+            "le": "fcmpl",
+        }
+
+        #for doubles
+        doubles_cmp_map = {
+            "eq": "dcmpl",
+            "ne": "dcmpl",
+            "lt": "dcmpl",
+            "ge": "dcmpl",
+            "gt": "dcmpl",
+            "le": "dcmpl",
+        }
+
+        # for longs
+        long_cmp_map = {
+            "eq": ("ifeq"),
+            "ne": ("ifne"),
+            "lt": ("iflt"),
+            "ge": ("ifge"),
+            "gt": ("ifgt"),
+            "le": ("ifle"),
+        }
+
+        match self.type:
+            case jvm.Int():
+                return f"{int_cmp_map[self.condition]} {self.target}"
+            case jvm.Reference():
+                return f"{ref_cmp_map[self.condition]} {self.target}"
+            #Support for floats
+            case jvm.Float():
+                return f"{float_cmp_map[self.condition]} {self.target}"
+            # Support for doubles
+            case jvm.Double():
+                return f"{doubles_cmp_map[self.condition]} {self.target}"
+            #support for longs
+            case jvm.Long():
+                branch = long_cmp_map[self.condition]
+                return ["lconst_0", "lcmp", f"{branch}"]
+        raise ValueError(f"Unknown comparision condition: {self.condition}")
+        # if self.condition in int_cmp_map:
+        #     return f"{int_cmp_map[self.condition]} {self.target}"
+        # elif self.condition in ref_cmp_map:
+        #     return f"{ref_cmp_map[self.condition]} {self.target}"
+        # else:
+        #     raise ValueError(f"Unknown comparison condition: {self.condition}")
 
     def semantics(self) -> str | None:
         semantics = """
