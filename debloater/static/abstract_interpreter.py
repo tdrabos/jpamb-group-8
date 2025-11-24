@@ -654,13 +654,16 @@ def initialstate_from_method[AV](methodid: jvm.AbsMethodID, domain: type[AV]) ->
 DOMAIN = Interval
 bc = Bytecode(jpamb.Suite(), dict())
 
-def static_bytecode_analysis(method_list: list[jvm.AbsMethodID]):
+def static_bytecode_analysis(method_list: list[str]):
     
     logger.debug(f"Starting Bytecode Analysis...")
     
-    unreachable_offset_by_method = dict()
+    unreachable_offset_by_method: dict[str, list[int]] = dict()
+    dead_args_mapping: dict[str, list[int]] = dict()
     
-    for method in method_list:
+    for m in method_list:
+        method = jvm.AbsMethodID.decode(m)
+        
         logger.debug(f"Currently analysing method: {method.extension.name}")
         
         sts = initialstate_from_method(method, DOMAIN)
@@ -679,21 +682,23 @@ def static_bytecode_analysis(method_list: list[jvm.AbsMethodID]):
         not_hit = [idx for idx, x in enumerate(all_ops) if x not in op_hit]
 
         
-        print(f"DEAD STORE: {dead_store}")
-        print(f"DEAD ARG: {dead_arg}")
+        dead_store_ops = [idx for idx, x in enumerate(all_ops) if x in dead_store.values()]
+        not_hit.extend(dead_store_ops)
         
-        for k, v in dead_store:
-            not_hit.append(v)
+        print(f"DEAD STORE IDX: {dead_store_ops}")
         
         print("NOT HIT")
         print(not_hit)
 
         unreachable_offset_by_method[method.methodid.name] = not_hit
+        dead_args_mapping[method.methodid.name] = dead_arg.keys()
+        
+    logger.debug(unreachable_offset_by_method)
         
     with open("target/decompiled/jpamb/cases/Bloated.json", "r", encoding="utf-8") as f:
         data = json.load(f)
-        json_data = dead_indices_to_lines_in_class(data, unreachable_offset_by_method, dead_arg.keys())
-        
+        json_data = dead_indices_to_lines_in_class(data, unreachable_offset_by_method, dead_args_mapping)
+        logger.debug(json_data)
         return json_data
 
 
