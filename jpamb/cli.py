@@ -1,7 +1,7 @@
 import click
 from pathlib import Path
 import shlex
-import enum
+import shutil
 import math
 import sys
 import json
@@ -216,7 +216,7 @@ def cli(ctx, workdir: Path, verbose):
 @cli.command()
 @click.pass_obj
 def checkhealth(suite):
-    """Check that the repostiory is setup correctly"""
+    """Check that the repository is setup correctly"""
     suite.checkhealth()
 
 
@@ -496,50 +496,102 @@ def evaluate(ctx, program, report, timeout, iterations, with_python):
 
 @cli.command()
 @click.option(
+    "-D",
+    "--docker",
+    help="the docker container to build with.",
+    default="ghcr.io/kalhauge/jvm2json:jdk-latest",
+)
+@click.option(
     "--compile / --no-compile",
     help="compile the java source files.",
+    default=None,
 )
 @click.option(
     "--decompile / --no-decompile",
     help="decompile the classfiles using jvm2json.",
+    default=None,
 )
 @click.option(
     "--document / --no-document",
-    help="decompile the classfiles using jvm2json.",
+    help="docmument the files",
+    default=None,
 )
 @click.option(
     "--test / --no-test",
     help="test that all cases are correct.",
+    default=None,
 )
 @click.pass_obj
-def build(suite, compile, decompile, document, test):
+def build(suite, compile, decompile, document, test, docker):
     """Rebuild all benchmarks."""
 
+    if not any(s for s in [compile, decompile, document, test]):
+        compile = compile is None
+        decompile = decompile is None
+        document = document is None
+        test = test is None
+
+    dockerbin = shutil.which("podman") or shutil.which("docker")
+
+    if not dockerbin:
+        raise click.UsageError("No docker or podman on PATH")
+
+    log.info(f"Using docker: {dockerbin}")
+
+    cmd = [
+        dockerbin,
+        "run",
+        "--rm",
+        "-v",
+        f"{suite.workfolder}:/workspace",
+        docker,
+    ]
+
     if compile:
+        log.info("Compiling")
         run(
-            ["mvn", "compile"],
+            cmd
+            + ["javac", "-d", "target/classes"]
+            + list(a.relative_to(suite.workfolder) for a in suite.sourcefiles()),
             logerr=log.warning,
             logout=log.info,
             timeout=600,
         )
+
+        log.info("Building Stats")
+
+        res, x = run(
+            cmd + ["java", "-cp", "target/classes", "jpamb.Runtime"],
+            logout=log.info,
+            logerr=log.debug,
+            timeout=60,
+        )
+        suite.case_file.parent.mkdir(exist_ok=True, parents=True)
+        suite.case_file.write_text("\n".join(sorted(res.splitlines())))
+
+        # TODO: Compute distribution.csv
 
     if decompile:
         log.info("Decompiling")
         for cl in suite.classes():
             log.info(f"Decompiling {cl}")
             res, t = run(
-                [
+                cmd
+                + [
                     "jvm2json",
                     "-s",
-                    suite.classfile(cl),
+                    suite.classfile(cl).relative_to(suite.workfolder),
                 ],
                 logerr=log.warning,
             )
-            with open(suite.decompiledfile(cl), "w") as f:
+            file = suite.decompiledfile(cl)
+            file.parent.mkdir(exist_ok=True, parents=True)
+            with open(file, "w") as f:
                 json.dump(json.loads(res), f, indent=2, sort_keys=True)
         log.success("Done decompiling")
 
     if document:
+        log.info("Documenting")
         opcode_counts = Counter()
         opcode_urls = {}
         class_opcodes = {}
@@ -574,7 +626,13 @@ def build(suite, compile, decompile, document, test):
                     if op in class_opcodes[classname]:
                         in_classes += " " + classname
 
-                rel = Path(getsourcefile(opcode.__class__)).relative_to(Path.cwd())
+                folder = Path(getsourcefile(opcode.__class__)).parent
+                while folder.name != "jpamb":
+                    folder = folder.parent
+
+                root = folder.parent
+
+                rel = Path(getsourcefile(opcode.__class__)).relative_to(root)
                 giturl = f"{rel}?plain=1#L{getsourcelines(opcode.__class__)[1]}"
 
                 document.write(
@@ -601,10 +659,11 @@ def build(suite, compile, decompile, document, test):
 
             try:
                 res, x = run(
-                    [
+                    cmd
+                    + [
                         "java",
                         "-cp",
-                        folder,
+                        folder.relative_to(suite.workfolder),
                         "-ea",
                         "jpamb.Runtime",
                         case.methodid.encode(),
@@ -856,6 +915,80 @@ def plot(ctx, report, directory):
 
         plot_scores(scores, times, labels, classes)
 
+@cli.command("debloat")
+@click.pass_context
+@click.option(
+    "--root", "-i",
+    "root_dir",
+    type=click.Path(file_okay=False, dir_okay=True, exists=True, path_type=Path),
+    required=True,
+    help="Root folder containing Java sources (project root).",
+)
+@click.option(
+    "--analysis-dir", "-A",
+    type=click.Path(file_okay=False, dir_okay=True, path_type=Path),
+    required=True,
+    help="Folder to write both analyzer JSON artifacts into (static + dynamic).",
+)
+@click.option(
+    "--apply/--no-apply",
+    default=False,
+    show_default=True,
+    help="Apply the deletions to files under --root",
+)
+@click.option(
+    "--with-python/--no-with-python",
+    "-W/-noW",
+    default=None,
+    help="If the analyzer subcommands are Python, run in same interpreter as jpamb.",
+)
+@click.option(
+    "--static-cmd",
+    default="analyze-static",
+    show_default=True,
+    help="Subcommand to invoke the static analyzer (joined after PROGRAM prefix).",
+)
+@click.option(
+    "--dynamic-cmd",
+    default="analyze-dynamic",
+    show_default=True,
+    help="Subcommand to invoke the dynamic analyzer (joined after PROGRAM prefix).",
+)
+@click.argument("PROGRAM", nargs=-1)
+def debloat(ctx,
+            root_dir: Path,
+            analysis_dir: Path,
+            apply: bool,
+            with_python,
+            static_cmd: str,
+            dynamic_cmd: str,
+            program):
+    """
+    Run static + dynamic analyzers, save both JSONs to --analysis-dir,
+    merge their results, optionally apply deletions, and emit a final report.
+    """
+    
+    # 0. Setup interpreter and root dir
+    program_prefix = resolve_cmd(program, with_python)
+    root = root_dir.resolve()
+    artifacts_dir = analysis_dir.resolve()
+
+    # 2. Run analysis
+    # Output: 2 json files containing information about what to delete
+    log.info(f"Running static analyzer: {static_cmd}")
+    # TODO: run static analyzer
+
+    log.info(f"Running dynamic analyzer: {dynamic_cmd}")
+    # TODO: run dynamic analyzer
+
+    # 3. Merge findings into a single json file or just execute static or dynamic based on input?
+    
+    # 4. If apply is true, do the deletions
+    
+    # 5. Check if the program runs
+    
+    # 6. if yes do some statistics (how code we got rid of etc.)
+    # if not, identify what breaks, redo and go to 5.
 
 if __name__ == "__main__":
     cli()

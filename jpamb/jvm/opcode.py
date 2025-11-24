@@ -28,9 +28,9 @@ class Opcode(ABC):
     def __post_init__(self):
         for f in fields(self):
             v = getattr(self, f.name)
-            assert isinstance(
-                v, f.type
-            ), f"Expected {f.name!r} to be type {f.type}, but was {v!r}, in {self!r}"
+            assert isinstance(v, f.type), (
+                f"Expected {f.name!r} to be type {f.type}, but was {v!r}, in {self!r}"
+            )
 
     @classmethod
     def from_json(cls, json: dict) -> "Opcode":
@@ -71,6 +71,8 @@ class Opcode(ABC):
                 opr = Goto
             case "return":
                 opr = Return
+            case "negate":
+                opr = Negate
             case "invoke":
                 match json["access"]:
                     case "virtual":
@@ -321,6 +323,31 @@ class Push(Opcode):
     def __str__(self):
         return f"push:{self.value.type} {self.value.value}"
 #        return f""
+
+
+@dataclass(frozen=True, order=True)
+class Negate(Opcode):
+    """The new array opcode"""
+
+    type: jvm.Type
+
+    @classmethod
+    def from_json(cls, json: dict) -> Opcode:
+        return cls(
+            offset=json["offset"],
+            type=jvm.Type.from_json(json["type"]),
+        )
+
+    def real(self) -> str:
+        return f"negate {self.type}"
+
+    def mnemonic(self) -> str:
+        match self.type:
+            case jvm.Int():
+                return "ineg"
+
+    def __str__(self):
+        return self.real()
 
 
 @dataclass(frozen=True, order=True)
@@ -1414,9 +1441,9 @@ class Return(Opcode):
     type: jvm.Type | None  # Return type (None for void return)
 
     def __post_init__(self):
-        assert (
-            self.type is None or self.type.is_stacktype()
-        ), "return only handles stack types {self.type()}"
+        assert self.type is None or self.type.is_stacktype(), (
+            "return only handles stack types {self.type()}"
+        )
 
     @classmethod
     def from_json(cls, json: dict) -> "Opcode":
