@@ -19,7 +19,7 @@ public class Bloated {
             n = i + n;
         }
 
-        return 1;
+        return unreachableBranchFor(0);
     }
     return 0;
   }
