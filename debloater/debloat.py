@@ -1,6 +1,8 @@
+import json
 import sys
 from loguru import logger
 
+from debloater.method_debloater import Debloat
 from debloater.static.abstract_interpreter import static_bytecode_analysis
 
 logger.remove()
@@ -27,6 +29,18 @@ def main_analysis():
     json_per_function = static_bytecode_analysis(called)
     
     # Debloating -> java source files
+    with open("src/main/java/jpamb/cases/Bloated.java", "r", encoding="utf-8") as f:
+        source_code = f.read()
+
+    debloater = Debloat(source_code)
+    output_path = debloater.debloat_from_spec(
+        json_per_function,
+        folder_path="out",
+        class_name="Bloated",
+        iteration=0,
+    )
+
+    print("Debloated file written to:", output_path)
     
     # Dynamic -> 
     

@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from jpamb.jvm.base import AbsMethodID
 import re
 import os
@@ -8,8 +9,48 @@ import os
 # Bonus: if you can manage to somehow automatically build the new source file after 
 # the debloating process (create bytecode json, eg. Bloated.json) then i love you
 
+def remove_args_from_methods(source: str, spec: Dict[str, Any]) -> str:
+    """
+    Given Java source and a spec of the form:
+      { "methodName": { "lines": [...], "args": [indices...] }, ... }
+    remove parameters at the given indices from each method's *signature*.
+    """
+    for method_name, data in spec.items():
+        arg_indices = set(data.get("args", []))
+        if not arg_indices:
+            continue  # nothing to remove for this method
 
-class Debloat:
+        # Simplified pattern: matches e.g.
+        #   public static int deadArg(int n) {
+        #   public static void unreachableLoopBranchOnIndex() {
+        #
+        # group(1): "public static int deadArg"
+        # group(2): "int n"  (or empty)
+        pattern = re.compile(
+            rf"(public\s+static\s+[^\s]+\s+{re.escape(method_name)}\s*)\(([^)]*)\)",
+            re.MULTILINE,
+        )
+
+        def replacer(m: re.Match) -> str:
+            prefix = m.group(1)
+            params_str = m.group(2).strip()
+            if not params_str:
+                # No params to begin with
+                return m.group(0)
+
+            # Split params by comma, keep order
+            params = [p.strip() for p in params_str.split(",") if p.strip()]
+            # Remove the ones whose indices appear in arg_indices (0-based)
+            new_params = [p for i, p in enumerate(params) if i not in arg_indices]
+            new_params_str = ", ".join(new_params)
+            return f"{prefix}({new_params_str})"
+
+        # Apply once per method (assuming one declaration per file)
+        source = pattern.sub(replacer, source, count=1)
+
+    return source
+
+class Debloat:    
     def __init__(self, source_code: str):
         self.lines_to_be_deleted = {}       # {AbsMethodID: [lists of line numbers]}
         self.source_code = source_code
@@ -95,3 +136,37 @@ class Debloat:
         sum_blocks = sum(blocks, []) # flatten list of lists
         new_source = self.debloat_source(sum_blocks) # debloat source
         self.write_debloated_file(folder_path, class_name, new_source, iteration) # write debloated file
+        
+        
+    def debloat_from_spec(self, spec: dict, folder_path: str, class_name: str, iteration: int) -> str:
+        """
+        spec: {
+          "methodName": {
+              "lines": [ ... ],
+              "args": [ ... ]
+          },
+          ...
+        }
+        """
+        # 1) Collect ALL line numbers to delete across all methods
+        all_lines_to_delete: set[int] = set()
+        for method_name, info in spec.items():
+            lines = info.get("lines", [])
+            if lines:
+                self.register_deletions(method_name, lines)
+                all_lines_to_delete.update(lines)
+
+        # 2) Delete those lines from the source once (line numbers refer to original file)
+        debloated = self.debloat_source(sorted(all_lines_to_delete))
+
+        # 3) Remove unused arguments from method signatures based on spec["..."]["args"]
+        debloated = remove_args_from_methods(debloated, spec)
+
+        # 4) Clean up extra blank lines
+        debloated = self.compress_blank_lines(debloated)
+
+        # 5) Write out the new debloated file
+        output_path = self.write_debloated_file(folder_path, class_name, debloated, iteration)
+        return output_path
+    
+
