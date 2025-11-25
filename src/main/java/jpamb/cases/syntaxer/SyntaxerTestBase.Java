@@ -5,7 +5,7 @@ public class SyntaxerTestBase {
   private static boolean helperVisited = false;
   private SyntaxerTestOther other = new SyntaxerTestOther();
     
-  public static void main(String[] args) {
+  public static void main() {
      syntaxerMain();
   }
 

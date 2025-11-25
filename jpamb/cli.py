@@ -10,6 +10,7 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
+from debloater.static.abstract_interpreter import static_bytecode_analysis
 from jpamb import model, logger, jvm
 from jpamb.logger import log
 
@@ -569,8 +570,6 @@ def build(suite, compile, decompile, document, test, docker):
         suite.case_file.parent.mkdir(exist_ok=True, parents=True)
         suite.case_file.write_text("\n".join(sorted(res.splitlines())))
 
-        # TODO: Compute distribution.csv
-
     if decompile:
         log.info("Decompiling")
         for cl in suite.classes():
@@ -925,70 +924,47 @@ def plot(ctx, report, directory):
     help="Root folder containing Java sources (project root).",
 )
 @click.option(
-    "--analysis-dir", "-A",
-    type=click.Path(file_okay=False, dir_okay=True, path_type=Path),
-    required=True,
-    help="Folder to write both analyzer JSON artifacts into (static + dynamic).",
-)
-@click.option(
     "--apply/--no-apply",
     default=False,
     show_default=True,
     help="Apply the deletions to files under --root",
 )
-@click.option(
-    "--with-python/--no-with-python",
-    "-W/-noW",
-    default=None,
-    help="If the analyzer subcommands are Python, run in same interpreter as jpamb.",
-)
-@click.option(
-    "--static-cmd",
-    default="analyze-static",
-    show_default=True,
-    help="Subcommand to invoke the static analyzer (joined after PROGRAM prefix).",
-)
-@click.option(
-    "--dynamic-cmd",
-    default="analyze-dynamic",
-    show_default=True,
-    help="Subcommand to invoke the dynamic analyzer (joined after PROGRAM prefix).",
-)
 @click.argument("PROGRAM", nargs=-1)
 def debloat(ctx,
             root_dir: Path,
-            analysis_dir: Path,
-            apply: bool,
-            with_python,
-            static_cmd: str,
-            dynamic_cmd: str,
-            program):
+            apply):
     """
-    Run static + dynamic analyzers, save both JSONs to --analysis-dir,
-    merge their results, optionally apply deletions, and emit a final report.
+    Run syntactic + static analyzers, save JSONs to debloater/results/json,
+    apply deletions, and emit a final report.
     """
     
-    # 0. Setup interpreter and root dir
-    program_prefix = resolve_cmd(program, with_python)
     root = root_dir.resolve()
-    artifacts_dir = analysis_dir.resolve()
 
     # 2. Run analysis
     # Output: 2 json files containing information about what to delete
-    log.info(f"Running static analyzer: {static_cmd}")
-    # TODO: run static analyzer
+    log.info(f"Running CFG builder - looking for unreferenced functions:")
+    # called, not_called = cfg(root)
 
-    log.info(f"Running dynamic analyzer: {dynamic_cmd}")
-    # TODO: run dynamic analyzer
+    called = [
+        "jpamb.cases.Bloated.unreachableBranchBasic:(I)I",
+        "jpamb.cases.Bloated.localInitButNotUsed()I"
+        "jpamb.cases.Bloated.unreachableBranchFor:(I)I",
+        "jpamb.cases.Bloated.unreachableBranchWhile:(I)I",
+        "jpamb.cases.Bloated.unreachableBranchArray:(I)I",
+        "jpamb.cases.Bloated.deadArg:(I)I",
+        "jpamb.cases.Bloated.deadStore:()I",
+        "jpamb.cases.Bloated.keepObservableArrayWrite:(I)V",
+        "jpamb.cases.Bloated.unreachableBranchBasicFloat:(F)F"
+    ]
+    log.info(f"Running static analyzer - looking for dead code inside functions:")
+    json_per_function = static_bytecode_analysis(called)
+    print(json_per_function)
 
-    # 3. Merge findings into a single json file or just execute static or dynamic based on input?
+    # 3. If apply, run debloater based on JSONs (CFG - functions, bytecode - lines)
     
-    # 4. If apply is true, do the deletions
+    # 4. Check if the program runs - dynamic
     
-    # 5. Check if the program runs
+    # 5. if yes do some statistics (how much code we got rid, how much of the bloated code actaully got found)
     
-    # 6. if yes do some statistics (how code we got rid of etc.)
-    # if not, identify what breaks, redo and go to 5.
-
 if __name__ == "__main__":
     cli()

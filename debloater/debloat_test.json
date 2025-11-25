@@ -1,0 +1,61 @@
+{
+    "unreachableBranchBasic": {
+        "lines": [
+            15,
+            16,
+            17,
+            18,
+            19
+        ],
+        "args": []
+    },
+    "unreachableBranchFor": {
+        "lines": [
+            38,
+            39,
+            40
+        ],
+        "args": []
+    },
+    "unreachableBranchWhile": {
+        "lines": [
+            53,
+            54,
+            55
+        ],
+        "args": []
+    },
+    "unreachableBranchArray": {
+        "lines": [
+            65,
+            66,
+            67,
+            68,
+            69
+        ],
+        "args": []
+    },
+    "deadArg": {
+        "lines": [],
+        "args": [
+            0
+        ]
+    },
+    "deadStore": {
+        "lines": [
+            81,
+            82
+        ],
+        "args": []
+    },
+    "unreachableBranchBasicFloat": {
+        "lines": [
+            100,
+            101,
+            102,
+            103,
+            104
+        ],
+        "args": []
+    }
+}

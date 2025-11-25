@@ -5,6 +5,19 @@ from interpreter import Frame, State, Stack, step  # your interpreter
 import sys
 
 
+# TODO: Lets only use this class to do the dynamic analyzer.
+# We have agreed on 2 analysis: 
+# 1. Checks if the program runs after debloating (must have)
+# 2. Checks the program based on coverage (nice to have, but if no time, we can omit)
+# TEST with input: Java source file, with NO bloated code (pick some from the Bloated.java and remove bloated code by hand then run analysis)
+# Use random input for test, while the input selector is not available
+# When it's ready, integrate with input selector
+# Expected outcome: check if runs with some test values all return ok final state
+# If not, then flag the function
+
+# ANOTHER TODO: 
+# Check runs with the new types (float, bool, array)
+
 
 # GENERATE VALUES: INT, BOOLEAN, FLOATS, ARRAYS:
 def gen_value(param_type):

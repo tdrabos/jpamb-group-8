@@ -9,17 +9,11 @@ import random
 logger.remove()
 logger.add(sys.stderr, format="[{level}] {message}")
 
-methodid, input = jpamb.getcase()
 
-
-@dataclass
+@dataclass(frozen=True, slots=True)
 class PC:
     method: jvm.AbsMethodID
     offset: int
-
-    def __iadd__(self, delta):
-        self.offset += delta
-        return self
 
     def __add__(self, delta):
         return PC(self.method, self.offset + delta)
@@ -101,7 +95,7 @@ class State:
 #         return 1
 #     return max(heap.keys()) + 1
 
-def arrayType(t: jvm.type) -> jvm.Value:
+def arrayType(t) -> jvm.Value:
     if isinstance(t, jvm.Int):
         return jvm.Value.int(0)
     elif isinstance(t, jvm.Boolean):
@@ -818,60 +812,6 @@ def step(state: State) -> State | str:
 
 # #END ------------------------------------------------------------------------------------
 
-
-
-
-
-frame = Frame.from_method(methodid)
-
-
-
-
-
-
-#DYNAMIC ANALYSIS:  ------------------------------------------------
-
-# Loop over each input value provided for the method
-for i, v in enumerate(input.values):
-    # Convert JVM types to integer representations
-    match v.type:
-        case jvm.Boolean():  # If the value is a boolean
-            # Convert True → 1, False → 0
-            v = jvm.Value.int(1 if v.value else 0)
-        case jvm.Int():  # If the value is already an integer
-            # Just wrap it in a JVM Value object
-            v = jvm.Value.int(v.value)
-    
-    # Store the converted value in the local variables of the frame
-    frame.locals[i] = v
-
-
-# Check if the method has parameters
-if methodid.extension.params:  # has arguments
-    # If the method takes arguments, we skip running it dynamically
-    # Print 0% coverage for this case
-    print(f"{methodid.extension.name}: 0%")
-    
-else:
-    # If there are no arguments, it's safe to execute dynamically
-    # Print 100% coverage for this case
-    print(f"{methodid.extension.name}: 100%")
-
-
-#END ---------------------------------------------------------------
-
-
-
-state = State({}, Stack.empty().push(frame))
-
-
-for x in range(1000):
-    state = step(state)
-    if isinstance(state, str):
-        print(state)
-        break
-else:
-    print("*")
 
 
 
