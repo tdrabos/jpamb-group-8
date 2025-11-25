@@ -14,19 +14,12 @@ public class Bloated {
     if (n > 0) {
         n = n+2;
 
-        if (n == 0) { // unreachable
-            int i = 2;
-            n = i + n;
-        }
-
         return unreachableBranchFor(0);
     }
     return 0;
   }
 
   public static int localInitButNotUsed() {
-    int i = 0;
-
     return 0;
   }
 
@@ -37,9 +30,6 @@ public class Bloated {
 
     for (int i = 0; i<4; i++) {
       n += 1;
-      if ( i == 4) { // unreachable
-            n -= i;
-            return 2;
       }
     }
     return 0;
@@ -52,10 +42,6 @@ public class Bloated {
     int i = 0;
     while (i < 4) {
       n += 1;
-      if ( i == 4) { // unreachable
-            n -= i;
-            return 2;
-      }
       i++;
     }
     return 0;
@@ -65,18 +51,13 @@ public class Bloated {
     if (n > 0) {
       int[] numbers = {1,2,3,4,5};
 
-      if (numbers.length > 5) {
-        n += 1;
-        return n;
-      }
-
       return numbers[0];
     }
 
     return 0;
   }
 
-  public static int deadArg(int n) {
+  public static int deadArg() {
     return 0;
   }
 
@@ -88,19 +69,12 @@ public class Bloated {
     if (f > 0.0f) {
         f = f+2.0f;
 
-        if (f == 0.0f) { // unreachable
-            int i = 2;
-            i++;
-        }
-
         return 1.0f;
     }
     return 0.0f;
   }
 
   public static int deadLocalInitialization(int n) {
-        int debug = 123; // never used
-
         int result = n;
         int tmp = 10;
         if (n > 0) {
@@ -115,16 +89,13 @@ public class Bloated {
 
         for (int i = 0; i < items.length; i++) {
             if (i == 1) items[i] = true; // reachable and has observable effect
-            if (i == 3) items[i] = false; // candidate for debloating
         }
     }
 
-    
     public static void unreachableArrayOutOfBounds() {
         int[] arr = { 1, 2, 3 };
 
         for (int i = 0; i < arr.length; i++) {
-            if (i == 5) { int x = arr[5]; } // would throw out of bounds if reachable
         }
     }
 
@@ -133,10 +104,6 @@ public class Bloated {
     public static int unreachableDivideByZeroBranch() {
         int n = 0;
         int res = 1;
-
-        if (n != 0 && n == 0) { // logically impossible
-            res = 1 / n; // unreachable
-        }
 
         return res;
     }

@@ -10,7 +10,6 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
-from debloater.static.abstract_interpreter import static_bytecode_analysis
 from jpamb import model, logger, jvm
 from jpamb.logger import log
 

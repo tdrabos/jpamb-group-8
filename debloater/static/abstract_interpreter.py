@@ -144,6 +144,8 @@ class AState[AV]:
             v1 = c_self.get(n1, c_other[n1])
             v2 = c_other.get(n2, c_self[n2])
             
+            if isinstance(v1, list):
+                return list(dict.fromkeys(v1 + v2))
             return v1 | v2
         
         def resolve_names(n1: str, n2: str, location: str) -> str:
@@ -185,7 +187,6 @@ class AState[AV]:
 
             # stack: same height, elementwise names (str)
             s1, s2 = f1.stack.items, f2.stack.items
-            
             assert len(s1) == len(s2), f"stacks should be of the same size to join"
             for i, (n1, n2) in enumerate(zip(s1, s2)):
                 # merge the constraints of the 2 stacks of value names in place
@@ -329,6 +330,7 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
             return states
         
         res = v1.compare(v2, cond)
+        
         c_true, c_false = domain.constrain(v1, v2, cond)
             
         targets: list[AState | str] = []
@@ -355,6 +357,7 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
     match opr:
         case jvm.Push(value=v):
             val_name = f"stack_{len(frame.stack.items)}"
+            
             constraints[val_name] = domain.abstract([v.value])
             
             nf = deepcopy(frame)
@@ -395,15 +398,8 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
             n2 = nf.stack.pop()
             n1 = nf.stack.pop()
             
-            if n1.startswith("stack"):
-                v1 = new_const.pop(n1)
-            else:
-                v1 = constraints[n1]
-                
-            if n2. startswith("stack"):
-                v2 = new_const.pop(n2)
-            else:
-                v2 = constraints[n2]
+            v1 = constraints[n1]
+            v2 = constraints[n2]
                         
             if op == jvm.BinaryOpr.Add:
                 res = v1.add(v2)
@@ -428,7 +424,6 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
 
         case jvm.Return(type=t):
             new_state = deepcopy(state)
-            
             top_frame = new_state.frames.pop()
             if t:
                 ret = top_frame.stack.pop()
@@ -527,6 +522,7 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
             if size_conc < 0:
                 return "negative size"
             
+            
             addr = len(state.heap)
 
             new_const = deepcopy(constraints)
@@ -534,7 +530,10 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
             
             arr_name = f"arr_{addr}"
             new_heap[addr] = arr_name
-            new_const[arr_name] = [addr, size_val]
+            
+            size_name = f"{arr_name}_size"
+            new_const[size_name] = deepcopy(size)
+            new_const[arr_name] = [addr, size_name]
 
             nf.stack.push(arr_name)
             nf.pc += 1
@@ -566,8 +565,8 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
         case jvm.ArrayLoad():
             nf = deepcopy(frame)
             
-            index_name = frame.stack.pop()
-            arr_name = frame.stack.pop()
+            index_name = nf.stack.pop()
+            arr_name = nf.stack.pop()
 
             index = constraints[index_name].concrete_value()
             addr = constraints[arr_name][0]
@@ -575,9 +574,8 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
             arr = state.heap[addr]
 
             name = f"{arr}_{index}"
-            val = constraints[name]
 
-            nf.stack.push(val)
+            nf.stack.push(name)
             nf.pc += 1
             return [mk_successor(nf)] 
             
@@ -618,7 +616,30 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
             res_frame.pc += 1
             
             return [mk_successor(new_frame=res_frame, constraints=new_const)]
-                
+        
+        case jvm.InvokeStatic(method=m):
+            # Work on a copy of the whole state
+            new_state = deepcopy(state)
+
+            caller = new_state.frames.peek()
+
+            nargs = len(m.extension.params)
+            arg_names = [caller.stack.pop() for _ in range(nargs)][::-1]
+
+            callee = PerVarFrame(
+                locals={}, 
+                stack=Stack.empty(),
+                pc=PC(method=m, offset=0),
+            )
+
+            for i, name in enumerate(arg_names):
+                callee.locals[i] = name
+                new_state.constraints[name] = constraints[name]
+
+            # 5. Push callee frame on top of the frame stack
+            new_state.frames.push(callee)
+
+            return [new_state]
         
 
 def manystep[AV](sts: StateSet[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
@@ -692,8 +713,6 @@ def static_bytecode_analysis(method_list: list[str]):
         op_hit.clear()
         dead_arg.clear()
         dead_store.clear()
-        
-    logger.debug(unreachable_offset_by_method)
         
     with open("target/decompiled/jpamb/cases/Bloated.json", "r", encoding="utf-8") as f:
         data = json.load(f)
