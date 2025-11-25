@@ -11,15 +11,18 @@ def main_analysis():
     # called, not_called = cfg(root)
 
     called = [
-        "jpamb.cases.Bloated.unreachableBranchBasic:(I)I",
-        "jpamb.cases.Bloated.unreachableBranchFor:(I)I",
-        "jpamb.cases.Bloated.unreachableBranchWhile:(I)I",
-        "jpamb.cases.Bloated.unreachableBranchArray:(I)I",
-        "jpamb.cases.Bloated.deadArg:(I)I",
-        "jpamb.cases.Bloated.deadStore:()I",
-        #"jpamb.cases.Bloated.keepObservableArrayWrite:(I)V",
-        "jpamb.cases.Bloated.unreachableBranchBasicFloat:(F)F"
-    ]
+    "jpamb.cases.Bloated.unreachableBranchBasic:(I)I",
+    "jpamb.cases.Bloated.localInitButNotUsed:()I",
+    "jpamb.cases.Bloated.unreachableBranchFor:(I)I",
+    "jpamb.cases.Bloated.unreachableBranchWhile:(I)I",
+    "jpamb.cases.Bloated.unreachableBranchArray:(I)I",
+    "jpamb.cases.Bloated.deadArg:(I)I",
+    "jpamb.cases.Bloated.unreachableBranchBasicFloat:(F)F",
+    "jpamb.cases.Bloated.deadLocalInitialization:(I)I",
+    "jpamb.cases.Bloated.unreachableLoopBranchOnIndex:()V",
+    "jpamb.cases.Bloated.unreachableArrayOutOfBounds:()V",
+    "jpamb.cases.Bloated.unreachableDivideByZeroBranch:()I",
+]
     logger.info(f"Running static analyzer - looking for dead code inside functions:")
     json_per_function = static_bytecode_analysis(called)
     

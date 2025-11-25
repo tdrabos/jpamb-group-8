@@ -145,6 +145,8 @@ class Type(ABC):
                     return Boolean()
                 case "float":
                     return Float()
+                case "byte":
+                    return Byte()
         if "base" in json:
             return Type.from_json(json["base"])
         if "kind" in json:

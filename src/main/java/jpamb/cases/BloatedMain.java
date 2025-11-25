@@ -1,5 +1,8 @@
 package jpamb.cases;
-
+import jpamb.utils.Case;
+import jpamb.utils.Tag;
+import jpamb.utils.*;
+import static jpamb.utils.Tag.TagType.*;
 
 // TODO: set up this class so that it can be built into a cfg, meaning, all methods accessibble from main are kept, the ones that are not are not
 // Example:
