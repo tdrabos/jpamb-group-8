@@ -84,7 +84,6 @@ def analyse(experiment, logger):
 
         df = pd.DataFrame(results)
         all_results.extend(results)
-        # todo pick best here?
         first = df.groupby(["method"]).first()
 
         tools.append(

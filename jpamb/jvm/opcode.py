@@ -993,7 +993,6 @@ class If(Opcode):
     """
 
     condition: str  # One of the CmpOpr values
-    type: jvm.Type
     target: int  # Jump target offset
 
     @classmethod
@@ -1170,7 +1169,7 @@ class Ifz(Opcode):
     """
 
     condition: str  # One of the CmpOpr values
-    type: jvm.Type
+   # type: jvm.Type
     target: int  # Jump target offset
 
     @classmethod

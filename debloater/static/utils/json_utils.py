@@ -66,8 +66,6 @@ def dead_indices_to_lines_in_class(
     that correspond to its dead bytecode indices.
     """
     result: Dict[str, List[int]] = {}
-    
-    print(dead_args)
 
     for m in class_json.get("methods", []):
         name = m["name"]
@@ -78,6 +76,7 @@ def dead_indices_to_lines_in_class(
         lines = dead_indices_to_lines_for_method(m, dead_indices)
         result[name] = dict()
         result[name]["lines"] = lines
+        result[name]["args"] = dead_args[name]
     
 
     return result

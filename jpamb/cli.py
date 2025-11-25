@@ -570,8 +570,6 @@ def build(suite, compile, decompile, document, test, docker):
         suite.case_file.parent.mkdir(exist_ok=True, parents=True)
         suite.case_file.write_text("\n".join(sorted(res.splitlines())))
 
-        # TODO: Compute distribution.csv
-
     if decompile:
         log.info("Decompiling")
         for cl in suite.classes():

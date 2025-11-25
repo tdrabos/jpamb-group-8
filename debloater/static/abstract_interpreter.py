@@ -685,20 +685,20 @@ def static_bytecode_analysis(method_list: list[str]):
         dead_store_ops = [idx for idx, x in enumerate(all_ops) if x in dead_store.values()]
         not_hit.extend(dead_store_ops)
         
-        print(f"DEAD STORE IDX: {dead_store_ops}")
         
-        print("NOT HIT")
-        print(not_hit)
-
         unreachable_offset_by_method[method.methodid.name] = not_hit
-        dead_args_mapping[method.methodid.name] = dead_arg.keys()
+        dead_args_mapping[method.methodid.name] = list(dead_arg.keys())
+        
+        op_hit.clear()
+        dead_arg.clear()
+        dead_store.clear()
         
     logger.debug(unreachable_offset_by_method)
         
     with open("target/decompiled/jpamb/cases/Bloated.json", "r", encoding="utf-8") as f:
         data = json.load(f)
         json_data = dead_indices_to_lines_in_class(data, unreachable_offset_by_method, dead_args_mapping)
-        logger.debug(json_data)
+        logger.debug(json.dumps(json_data, indent=4))
         return json_data
 
 

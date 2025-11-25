@@ -22,7 +22,6 @@ def main_analysis():
     ]
     logger.info(f"Running static analyzer - looking for dead code inside functions:")
     json_per_function = static_bytecode_analysis(called)
-    print(json_per_function)
     
     # Debloating -> java source files
     

@@ -95,7 +95,7 @@ class State:
 #         return 1
 #     return max(heap.keys()) + 1
 
-def arrayType(t: jvm.type) -> jvm.Value:
+def arrayType(t) -> jvm.Value:
     if isinstance(t, jvm.Int):
         return jvm.Value.int(0)
     elif isinstance(t, jvm.Boolean):

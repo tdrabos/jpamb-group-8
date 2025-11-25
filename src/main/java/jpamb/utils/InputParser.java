@@ -49,7 +49,6 @@ public class InputParser {
       nextToken();
       return value;
     } else if (currentToken.matches("'[^']+'")) {
-      // TODO does not handle '\''
       return currentToken.charAt(1);
     } else if (currentToken.equals("true")) {
       nextToken();

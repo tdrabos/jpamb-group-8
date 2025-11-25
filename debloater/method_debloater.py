@@ -2,6 +2,13 @@ from jpamb.jvm.base import AbsMethodID
 import re
 import os
 
+
+# TODO: Test this with the provided "debloat_test.json" AND Bloated.java as input.
+# Expected output: NEW Java souece file with the flagged line numbers and arguments (marked with index) removed.
+# Bonus: if you can manage to somehow automatically build the new source file after 
+# the debloating process (create bytecode json, eg. Bloated.json) then i love you
+
+
 class Debloat:
     def __init__(self, source_code: str):
         self.lines_to_be_deleted = {}       # {AbsMethodID: [lists of line numbers]}

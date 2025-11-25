@@ -8,6 +8,11 @@ import sys
 from pathlib import Path
 from tree_sitter import Query, QueryCursor
 
+# TODO: Expected output of this whole thing:
+# A list of Method ID STRINGS, which are in the following format:
+# "jpamb.cases.Bloated.unreachableBranchBasic:(I)I"
+# For reference: check debloat.py, because I have the input of my static analyzer as the "called" array there. That is the format i need
+
 log = logging
 log.basicConfig(level=logging.DEBUG)
 
