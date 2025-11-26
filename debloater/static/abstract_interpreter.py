@@ -618,7 +618,6 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
             return [mk_successor(new_frame=res_frame, constraints=new_const)]
         
         case jvm.InvokeStatic(method=m):
-            # Work on a copy of the whole state
             new_state = deepcopy(state)
 
             caller = new_state.frames.peek()
@@ -636,7 +635,6 @@ def step[AV](state: AState[AV], domain: type[AV]) -> Iterable[AState[AV] | str]:
                 callee.locals[i] = name
                 new_state.constraints[name] = constraints[name]
 
-            # 5. Push callee frame on top of the frame stack
             new_state.frames.push(callee)
 
             return [new_state]

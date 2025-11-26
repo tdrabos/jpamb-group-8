@@ -1,141 +1,167 @@
 package jpamb.cases;
+
 import jpamb.utils.Case;
 import jpamb.utils.Tag;
 import jpamb.utils.*;
 import static jpamb.utils.Tag.TagType.*;
 
-// TODO: set up this class so that it can be built into a cfg, meaning, all methods accessibble from main are kept, the ones that are not are not
-// Example:
-// public static void main() {
-//         res1 = deadLocalInitialization(10)
-//         res2 = deadArrayStore()
-
-//         return earlyReturnDeadTail(res1 + res2)
-//     }
-// Do this for some functions, and leave some that are not reachable, these will be pre-pruned by the syntaxer
-
 public class BloatedMain {
 
-    private static boolean helperVisited = false;
-
     public static void main() {
-        
+
+        // Basic branch reachability: inner n == 0 branch is unreachable for n > 0
+        int b1 = unreachableBranchBasic(1);
+
+        // Dead argument: n is never used inside the method
+        int dead = deadArg(42);
+
+        // For-loop with unreachable branch (i == 4 never true since i in {0,1,2,3})
+        int f1 = unreachableBranchFor(1);
+
+        // While-loop with unreachable branch (i == 4 never true since i in {0,1,2,3})
+        int w1 = unreachableBranchWhile(1);
+
+        // Array-based reachability: numbers.length is always 5, so numbers.length > 5
+        // is unreachable
+        int arr1 = unreachableBranchArray(1);
+
+        // Float variant of unreachable branch: f == 0.0f inside f > 0.0f branch is
+        // unreachable
+        float fb = unreachableBranchBasicFloat(1.0f);
+
+        // Dead local initialization / dead tmp pattern
+        int dl = deadLocalInitialization(10);
+
+        // Loop/index reachability with unreachable i == 3 branch
+        unreachableLoopBranchOnIndex();
+
+        // Out-of-bounds access that is syntactically present but unreachable (i == 5
+        // impossible)
+        unreachableArrayOutOfBounds();
+
+        // Logically impossible condition: n != 0 && n == 0, so divide-by-zero is
+        // unreachable
+        int udz = unreachableDivideByZeroBranch();
+
+        // Local init that is never used (simple dead local)
+        int li = localInitButNotUsed();
+
+        int combined = b1 + dead + f1 + w1 + arr1 + dl + udz + li;
+        return combined;
     }
 
-    // Dead local + dead store inside reachable code
-    // The debloater should be able to remove debug/tmp without changing behavior.x
+    public static int unreachableBranchBasic(int n) {
+        if (n == 0) {
+            return 1 + n;
+        }
+
+        if (n > 0) {
+            n = n + 2;
+            if (n == 0) { // unreachable
+                int i = 2;
+                n = i + n;
+            }
+        }
+        return 0;
+    }
+
+    public static int localInitButNotUsed() {
+        int i = 0;
+        return 0;
+    }
+
+    public static int unreachableBranchFor(int n) {
+        if (n == 0) {
+            return 1 + n;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            n += 1;
+            if (i == 4) { // unreachable
+                n -= i;
+                return 2;
+            }
+        }
+        return 0;
+    }
+
+    public static int unreachableBranchWhile(int n) {
+        if (n == 0) {
+            return 1 + n;
+        }
+        int i = 0;
+        while (i < 4) {
+            n += 1;
+            if (i == 4) { // unreachable
+                n -= i;
+                return 2;
+            }
+            i++;
+        }
+        return 0;
+    }
+
+    public static int unreachableBranchArray(int n) {
+        if (n > 0) {
+            int[] numbers = { 1, 2, 3, 4, 5 };
+            if (numbers.length > 5) {
+                n += 1;
+                return n;
+            }
+            return numbers[0];
+        }
+        return 0;
+    }
+
+    public static int deadArg(int n) {
+        return 0;
+    }
+
+    public static float unreachableBranchBasicFloat(float f) {
+        if (f == 0.0f) {
+            return 1.5f + f;
+        }
+        if (f > 0.0f) {
+            f = f + 2.0f;
+
+            if (f == 0.0f) { // unreachable
+                int i = 2;
+                i++;
+            }
+            return 1.0f;
+        }
+        return 0.0f;
+    }
+
     public static int deadLocalInitialization(int n) {
         int debug = 123; // never used
         int result = n;
+        int tmp = 10;
         if (n > 0) {
-            int tmp = 10;
-            tmp = 20; // dead store: first assignment to tmp is never observed
+            tmp = 20;
         }
-        return result;
-    }
-
-    // Dead store to array element
-    @Tag({ ARRAY })
-    public static int deadArrayStore() {
-        int[] a = new int[3]; // [0, 0, 0]
-        a[1] = 5;
-        a[1] = 7; // dead write: value 5 is never read
-        int sum = a[0] + a[1] + a[2];
-        assert sum == 7;
-        return sum;
-    }
-
-    // Loop-invariant computation + always-false branch
-    // Checks loop handling plus removal of loop-invariant dead code.
-    @Tag({ LOOP })
-    public static int loopInvariantComputation(int n) {
-        int sum = 0;
-        for (int i = 0; i < n; i++) {
-            int invariant = 10; // same every iteration, never observed
-            sum += i;
-            if (invariant == 11) { // always false, dead branch
-                sum += invariant;
-            }
-        }
-        assert sum == n * (n - 1) / 2;
-        return sum;
-    }
-
-    // Observable array write that must NOT be removed
-    // Ensures debloater does not treat this as dead just because it's a simple
-    // pattern
-    @Tag({ ARRAY })
-    public static int keepObservableArrayWrite() {
-        int[] a = { 1, 2, 3 };
-        a[1] = 5; // this write is observable via the later read
-        int x = a[1]; // must still be 5 after debloating
-        assert x == 5;
-        return x;
-    }
-
-    // Helper with side effect used below
-    public static boolean setFlag(int[] arr) {
-        arr[0] = 42; // side effect that must only happen when short-circuit allows
-        return true;
-    }
-
-    // Short-circuit boolean with side effects
-    // Tests that the debloater respects side effects hidden behind short-circuit
-    // logic.
-    @Tag({ CALL, ARRAY })
-    public static void shortCircuitBooleanSideEffect(int n) {
-        int[] arr = new int[] { 0 };
-        if (n > 0 && setFlag(arr)) {
-            // body is irrelevant; side effect is in setFlag
-        }
-        if (n <= 0) {
-            // setFlag should never have been called
-            assert arr[0] == 0;
-        } else {
-            // setFlag MUST have been called
-            assert arr[0] == 42;
-        }
-    }
-
-    // Early return + dead tail with a potential exception
-    // Debloater can safely remove the dead tail but must keep the live part.
-    public static int earlyReturnDeadTail(int n) {
-        if (n == 0) {
-            return 0;
-        }
-        int result = n;
-        if (result > 0) {
-            return result;
-        }
-        // Dead code: impossible to reach
-        int dead = 10 / 0;
-        return dead;
+        return result + tmp;
     }
 
     // The debloater should keep i == 1 and remove i == 3 as unreachable
-    @Tag({ ARRAY, LOOP })
     public static void unreachableLoopBranchOnIndex() {
         boolean[] items = { true, false, true };
 
         for (int i = 0; i < items.length; i++) {
-            if (i == 1) {
+            if (i == 1)
                 items[i] = true; // reachable and has observable effect
-            }
-            if (i == 3) { // unreachable: i is only 0,1,2
+            if (i == 3)
                 items[i] = false; // candidate for debloating
-            }
         }
     }
 
-    @Tag({ ARRAY, LOOP })
     public static void unreachableArrayOutOfBounds() {
         int[] arr = { 1, 2, 3 };
 
         for (int i = 0; i < arr.length; i++) {
-            if (i == 5) { // unreachable because i in {0,1,2}
-                int x = arr[5]; // would throw out of bounds if reachable
-                assert x == 0;
-            }
+            if (i == 5) {
+                int x = arr[5];
+            } // would throw out of bounds if reachable
         }
     }
 
@@ -150,5 +176,23 @@ public class BloatedMain {
         }
 
         return res;
+    }
+
+    // TWO METHODS THAT ARE NEVER CALLED, thus unreachable from main.
+    // Should be pre-pruned by syntaxer
+
+    public static void completelyUncalledHelper() {
+        int x = 10;
+        x = x + 20; // dead store
+        if (false) {
+            System.out.println(x);
+        }
+    }
+
+    @Tag({ ARRAY })
+    public static int unusedArrayMutation() {
+        int[] a = { 7, 7, 7 };
+        a[2] = 99; // observable internally, but method never called
+        return a[2];
     }
 }

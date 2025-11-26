@@ -4,32 +4,39 @@ from loguru import logger
 
 from debloater.method_debloater import Debloat
 from debloater.static.abstract_interpreter import static_bytecode_analysis
+from debloater.syntax_analyzer import cfg
+from jpamb.jvm.base import AbsMethodID
 
 logger.remove()
 logger.add(sys.stderr, format="[{level}] {message}", level="DEBUG")
 
-def main_analysis(execute = False):
+def main_analysis(execute = True, from_main=False):
     logger.info(f"Running CFG builder - looking for unreferenced functions:")
-    # called, not_called = cfg(root)
+    called, not_called = cfg(AbsMethodID.decode("jpamb.cases.BloatedMain.main:()I"), "BloatedMain")
+
+    logger.debug(f"Called:")
+    for c in called: print(c)
+    logger.debug(f"Not called:")
+    for n in not_called: print(n)
 
     called = [
-    "jpamb.cases.Bloated.unreachableBranchBasic:(I)I",
-    "jpamb.cases.Bloated.localInitButNotUsed:()I",
-    "jpamb.cases.Bloated.unreachableBranchFor:(I)I",
-    "jpamb.cases.Bloated.unreachableBranchWhile:(I)I",
-    "jpamb.cases.Bloated.unreachableBranchArray:(I)I",
-    "jpamb.cases.Bloated.deadArg:(I)I",
-    "jpamb.cases.Bloated.unreachableBranchBasicFloat:(F)F",
-    "jpamb.cases.Bloated.deadLocalInitialization:(I)I",
-    "jpamb.cases.Bloated.unreachableLoopBranchOnIndex:()V",
-    "jpamb.cases.Bloated.unreachableArrayOutOfBounds:()V",
-    "jpamb.cases.Bloated.unreachableDivideByZeroBranch:()I",
-]
+        "jpamb.cases.Bloated.unreachableBranchBasic:(I)I",
+        "jpamb.cases.Bloated.localInitButNotUsed:()I",
+        "jpamb.cases.Bloated.unreachableBranchFor:(I)I",
+        "jpamb.cases.Bloated.unreachableBranchWhile:(I)I",
+        "jpamb.cases.Bloated.unreachableBranchArray:(I)I",
+        "jpamb.cases.Bloated.deadArg:(I)I",
+        "jpamb.cases.Bloated.unreachableBranchBasicFloat:(F)F",
+        "jpamb.cases.Bloated.deadLocalInitialization:(I)I",
+        "jpamb.cases.Bloated.unreachableLoopBranchOnIndex:()V",
+        "jpamb.cases.Bloated.unreachableArrayOutOfBounds:()V",
+        "jpamb.cases.Bloated.unreachableDivideByZeroBranch:()I",
+    ]
     logger.info(f"Running static analyzer - looking for dead code inside functions:")
     json_per_function = static_bytecode_analysis(called)
 
     if execute:
-         # Debloating -> java source files
+        # Debloating -> java source files
         with open("src/main/java/jpamb/cases/Bloated.java", "r", encoding="utf-8") as f:
             source_code = f.read()
         
@@ -46,4 +53,4 @@ def main_analysis(execute = False):
         # Dynamic -> 
     
 
-main_analysis(execute=True)
+main_analysis(execute=False)
