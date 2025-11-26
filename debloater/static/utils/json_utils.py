@@ -26,7 +26,6 @@ def _build_offset_to_line(lines_table: list[dict]) -> callable:
             next_line = entries[prev_idx + 1]["line"]
             if next_line > cur_line:
                 return set(range(cur_line, next_line))
-        
         return {cur_line}
 
     return offset_to_lines

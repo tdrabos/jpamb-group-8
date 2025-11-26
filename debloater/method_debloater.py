@@ -3,11 +3,16 @@ from jpamb.jvm.base import AbsMethodID
 import re
 import os
 
-
-# TODO: Test this with the provided "debloat_test.json" AND Bloated.java as input.
-# Expected output: NEW Java souece file with the flagged line numbers and arguments (marked with index) removed.
-# Bonus: if you can manage to somehow automatically build the new source file after 
-# the debloating process (create bytecode json, eg. Bloated.json) then i love you
+def rename_java_class(source: str, old_name: str, new_name: str) -> str:
+    """
+    Rename the class declaration from old_name to new_name.
+    Handles things like:
+        public class Bloated {
+        public final class Bloated {
+        class Bloated {
+    """
+    pattern = re.compile(rf"(\b(?:public\s+)?(?:final\s+)?class\s+){old_name}\b")
+    return pattern.sub(rf"\1{new_name}", source, count=1)
 
 def remove_args_from_methods(source: str, spec: Dict[str, Any]) -> str:
     """
@@ -116,7 +121,7 @@ class Debloat:
         if not os.path.exists(folder_path):
             os.makedirs(folder_path, exist_ok=True)
 
-        new_filename = f"{class_name}_debloated_{iteration}.java"
+        new_filename = f"{class_name}Debloated.java"
         output_path = os.path.join(folder_path, new_filename)
 
         with open(output_path, "w", encoding="utf-8") as f:
@@ -161,11 +166,15 @@ class Debloat:
 
         # 3) Remove unused arguments from method signatures based on spec["..."]["args"]
         debloated = remove_args_from_methods(debloated, spec)
+        
+        # 4) Rename class, because classname should be = to filename
+        new_class_name = class_name + "Debloated"
+        debloated = rename_java_class(debloated, class_name, new_class_name)
 
-        # 4) Clean up extra blank lines
+        # 5) Clean up extra blank lines
         debloated = self.compress_blank_lines(debloated)
 
-        # 5) Write out the new debloated file
+        # 6) Write out the new debloated file
         output_path = self.write_debloated_file(folder_path, class_name, debloated, iteration)
         return output_path
     
