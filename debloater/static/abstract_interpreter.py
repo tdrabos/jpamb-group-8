@@ -673,7 +673,7 @@ def initialstate_from_method[AV](methodid: jvm.AbsMethodID, domain: type[AV]) ->
 DOMAIN = Interval
 bc = Bytecode(jpamb.Suite(), dict())
 
-def static_bytecode_analysis(method_list: list[str]):
+def static_bytecode_analysis(method_list: list[str], file_path: str):
     
     logger.debug(f"Starting Bytecode Analysis...")
     
@@ -712,7 +712,8 @@ def static_bytecode_analysis(method_list: list[str]):
         dead_arg.clear()
         dead_store.clear()
         
-    with open("target/decompiled/jpamb/cases/Bloated.json", "r", encoding="utf-8") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
+        print(file_path)
         data = json.load(f)
         json_data = dead_indices_to_lines_in_class(data, unreachable_offset_by_method, dead_args_mapping)
         logger.debug(json.dumps(json_data, indent=4))

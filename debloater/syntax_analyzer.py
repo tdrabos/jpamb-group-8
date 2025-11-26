@@ -247,6 +247,8 @@ class MethodAnalyzer:
                 continue
             if not m.descriptor:
                 continue
+            if m.methodname == "main":
+                continue
             ids.append(f"{m.class_name}.{m.methodname}:{m.descriptor}")
 
         return sorted(ids)
@@ -448,7 +450,6 @@ def cfg(main_method_id: str, class_name: str):
     result = analyzer.analyze()
     if not result:
         log.error(f"Failed to construct CFG for {class_name} main method")
-    print(f"result: {result}")
     # Produce the "called" array in the required string format
     all_m = analyzer.method_id_strings_for_target_class(result, class_name)
     not_called = analyzer.method_id_strings_never_called_in_target(result, class_name, main_method_id)
