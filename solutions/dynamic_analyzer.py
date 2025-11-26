@@ -23,7 +23,7 @@ import sys
 def gen_value(param_type):
     if isinstance(param_type, jvm.Int) or param_type == "I":
         return random.randint(-10, 10)
-    elif isinstance(param_type, jvm.Bool) or param_type == "Z":
+    elif isinstance(param_type, jvm.Boolean) or param_type == "Z":
         return random.choice([True, False])
     elif isinstance(param_type, jvm.Float) or param_type == "F":
         return random.uniform(-10.0, 10.0)  # generates a float
