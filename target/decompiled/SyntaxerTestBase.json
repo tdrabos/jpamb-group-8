@@ -1,0 +1,694 @@
+{
+  "access": [
+    "public",
+    "super"
+  ],
+  "annotations": [],
+  "bootstrapmethods": [],
+  "enclosingmethod": null,
+  "fields": [
+    {
+      "access": [
+        "private",
+        "static"
+      ],
+      "annotations": [],
+      "name": "helperVisited",
+      "type": {
+        "annotations": [],
+        "base": "boolean"
+      },
+      "value": null
+    },
+    {
+      "access": [
+        "private"
+      ],
+      "annotations": [],
+      "name": "other",
+      "type": {
+        "annotations": [],
+        "args": [],
+        "inner": null,
+        "kind": "class",
+        "name": "jpamb/cases/syntaxer/SyntaxerTestOther"
+      },
+      "value": null
+    }
+  ],
+  "innerclasses": [],
+  "interfaces": [],
+  "methods": [
+    {
+      "access": [
+        "public"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "access": "special",
+            "method": {
+              "args": [],
+              "is_interface": false,
+              "name": "<init>",
+              "ref": {
+                "kind": "class",
+                "name": "java/lang/Object"
+              },
+              "returns": null
+            },
+            "offset": 1,
+            "opr": "invoke"
+          },
+          {
+            "index": 0,
+            "offset": 4,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "class": "jpamb/cases/syntaxer/SyntaxerTestOther",
+            "offset": 5,
+            "opr": "new"
+          },
+          {
+            "offset": 8,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "access": "special",
+            "method": {
+              "args": [],
+              "is_interface": false,
+              "name": "<init>",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/syntaxer/SyntaxerTestOther"
+              },
+              "returns": null
+            },
+            "offset": 9,
+            "opr": "invoke"
+          },
+          {
+            "field": {
+              "class": "SyntaxerTestBase",
+              "name": "other",
+              "type": {
+                "kind": "class",
+                "name": "jpamb/cases/syntaxer/SyntaxerTestOther"
+              }
+            },
+            "offset": 12,
+            "opr": "put",
+            "static": false
+          },
+          {
+            "offset": 15,
+            "opr": "return",
+            "type": null
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 3,
+            "offset": 0
+          },
+          {
+            "line": 6,
+            "offset": 2
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 3,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "<init>",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "access": "static",
+            "method": {
+              "args": [],
+              "is_interface": false,
+              "name": "syntaxerMain",
+              "ref": {
+                "kind": "class",
+                "name": "SyntaxerTestBase"
+              },
+              "returns": null
+            },
+            "offset": 0,
+            "opr": "invoke"
+          },
+          {
+            "offset": 3,
+            "opr": "return",
+            "type": null
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 9,
+            "offset": 0
+          },
+          {
+            "line": 10,
+            "offset": 1
+          }
+        ],
+        "max_locals": 0,
+        "max_stack": 0,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "main",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "field": {
+              "class": "java/lang/System",
+              "name": "out",
+              "type": {
+                "kind": "class",
+                "name": "java/io/PrintStream"
+              }
+            },
+            "offset": 0,
+            "opr": "get",
+            "static": true
+          },
+          {
+            "offset": 3,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Syntaxer Main"
+            }
+          },
+          {
+            "access": "virtual",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "name": "println",
+              "ref": {
+                "kind": "class",
+                "name": "java/io/PrintStream"
+              },
+              "returns": null
+            },
+            "offset": 5,
+            "opr": "invoke"
+          },
+          {
+            "field": {
+              "class": "SyntaxerTestBase",
+              "name": "helperVisited",
+              "type": "boolean"
+            },
+            "offset": 8,
+            "opr": "get",
+            "static": true
+          },
+          {
+            "condition": "ne",
+            "offset": 11,
+            "opr": "ifz",
+            "target": 8
+          },
+          {
+            "offset": 14,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "field": {
+              "class": "SyntaxerTestBase",
+              "name": "helperVisited",
+              "type": "boolean"
+            },
+            "offset": 15,
+            "opr": "put",
+            "static": true
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [],
+              "is_interface": false,
+              "name": "syntaxerHelper",
+              "ref": {
+                "kind": "class",
+                "name": "SyntaxerTestBase"
+              },
+              "returns": null
+            },
+            "offset": 18,
+            "opr": "invoke"
+          },
+          {
+            "offset": 21,
+            "opr": "return",
+            "type": null
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 14,
+            "offset": 0
+          },
+          {
+            "line": 16,
+            "offset": 3
+          },
+          {
+            "line": 17,
+            "offset": 5
+          },
+          {
+            "line": 18,
+            "offset": 7
+          },
+          {
+            "line": 20,
+            "offset": 8
+          }
+        ],
+        "max_locals": 0,
+        "max_stack": 2,
+        "stack_map": [
+          {
+            "index": 8,
+            "type": "same"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "syntaxerMain",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "field": {
+              "class": "java/lang/System",
+              "name": "out",
+              "type": {
+                "kind": "class",
+                "name": "java/io/PrintStream"
+              }
+            },
+            "offset": 0,
+            "opr": "get",
+            "static": true
+          },
+          {
+            "offset": 3,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Syntaxer Helper"
+            }
+          },
+          {
+            "access": "virtual",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "name": "println",
+              "ref": {
+                "kind": "class",
+                "name": "java/io/PrintStream"
+              },
+              "returns": null
+            },
+            "offset": 5,
+            "opr": "invoke"
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [],
+              "is_interface": false,
+              "name": "syntaxerMain",
+              "ref": {
+                "kind": "class",
+                "name": "SyntaxerTestBase"
+              },
+              "returns": null
+            },
+            "offset": 8,
+            "opr": "invoke"
+          },
+          {
+            "offset": 11,
+            "opr": "return",
+            "type": null
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 23,
+            "offset": 0
+          },
+          {
+            "line": 25,
+            "offset": 3
+          },
+          {
+            "line": 26,
+            "offset": 4
+          }
+        ],
+        "max_locals": 0,
+        "max_stack": 2,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "syntaxerHelper",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "field": {
+              "class": "java/lang/System",
+              "name": "out",
+              "type": {
+                "kind": "class",
+                "name": "java/io/PrintStream"
+              }
+            },
+            "offset": 0,
+            "opr": "get",
+            "static": true
+          },
+          {
+            "offset": 3,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Never Called Method"
+            }
+          },
+          {
+            "access": "virtual",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "name": "println",
+              "ref": {
+                "kind": "class",
+                "name": "java/io/PrintStream"
+              },
+              "returns": null
+            },
+            "offset": 5,
+            "opr": "invoke"
+          },
+          {
+            "index": 0,
+            "offset": 8,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "access": "virtual",
+            "method": {
+              "args": [],
+              "name": "onlyCalledByANeverCalledMethod",
+              "ref": {
+                "kind": "class",
+                "name": "SyntaxerTestBase"
+              },
+              "returns": null
+            },
+            "offset": 9,
+            "opr": "invoke"
+          },
+          {
+            "offset": 12,
+            "opr": "return",
+            "type": null
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 29,
+            "offset": 0
+          },
+          {
+            "line": 30,
+            "offset": 3
+          },
+          {
+            "line": 31,
+            "offset": 5
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 2,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "neverCalledMethod",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "field": {
+              "class": "java/lang/System",
+              "name": "out",
+              "type": {
+                "kind": "class",
+                "name": "java/io/PrintStream"
+              }
+            },
+            "offset": 0,
+            "opr": "get",
+            "static": true
+          },
+          {
+            "offset": 3,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Called Method"
+            }
+          },
+          {
+            "access": "virtual",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "name": "println",
+              "ref": {
+                "kind": "class",
+                "name": "java/io/PrintStream"
+              },
+              "returns": null
+            },
+            "offset": 5,
+            "opr": "invoke"
+          },
+          {
+            "offset": 8,
+            "opr": "return",
+            "type": null
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 34,
+            "offset": 0
+          },
+          {
+            "line": 35,
+            "offset": 3
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 2,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "onlyCalledByANeverCalledMethod",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "offset": 0,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "field": {
+              "class": "SyntaxerTestBase",
+              "name": "helperVisited",
+              "type": "boolean"
+            },
+            "offset": 1,
+            "opr": "put",
+            "static": true
+          },
+          {
+            "offset": 4,
+            "opr": "return",
+            "type": null
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 5,
+            "offset": 0
+          }
+        ],
+        "max_locals": 0,
+        "max_stack": 1,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "<clinit>",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    }
+  ],
+  "name": "SyntaxerTestBase",
+  "super": {
+    "annotations": [],
+    "args": [],
+    "inner": null,
+    "name": "java/lang/Object"
+  },
+  "typeparams": [],
+  "version": [
+    65,
+    0
+  ]
+}
