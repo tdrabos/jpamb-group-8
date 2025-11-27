@@ -1053,6 +1053,13 @@ class If(Opcode):
                 return f"{int_cmp_map[self.condition]} {self.target}"
             case jvm.Reference():
                 return f"{ref_cmp_map[self.condition]} {self.target}"
+            case jvm.Boolean():
+                if self.condition == "eq":
+                    return f"if_icmpeq {self.target}"
+                elif self.condition == "ne":
+                    return f"if_icmpne {self.target}"
+                else:
+                    raise ValueError(f"Boolean type supports only eq/ne comparison, got '{self.condition}'")
             # Support for floats
             case jvm.Float():
                 cmp_instr, branch = float_cmp_map[self.condition]
@@ -1066,6 +1073,8 @@ class If(Opcode):
                 branch = long_cmp_map[self.condition] 
                 return ["lcmp", f"{branch} {self.target}"]      
         raise ValueError(f"Unsupported type {self.type} for If") 
+        
+        
         # if self.condition in int_cmp_map:
         #     return f"{int_cmp_map[self.condition]} {self.target}"
         # elif self.condition in ref_cmp_map:
@@ -1231,6 +1240,8 @@ class Ifz(Opcode):
                 return f"{int_cmp_map[self.condition]} {self.target}"
             case jvm.Reference():
                 return f"{ref_cmp_map[self.condition]} {self.target}"
+            case jvm.Boolean():
+                return f"ifeq {self.target}"
             #Support for floats
             case jvm.Float():
                 return f"{float_cmp_map[self.condition]} {self.target}"

@@ -5,9 +5,12 @@ from jpamb.jvm.base import MethodID
 import sys
 from loguru import logger
 import random
+from jpamb.jvm.base import MethodID
 
 logger.remove()
 logger.add(sys.stderr, format="[{level}] {message}")
+
+methodid, input = jpamb.getcase()
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,10 +105,10 @@ def arrayType(t) -> jvm.Value:
         return jvm.Value.boolean(False)
     elif isinstance(t,jvm.Float):
         return jvm.Value(jvm.Float(), 0.0)
-    elif isinstance(t, jvm.Long):
-        return jvm.Value(jvm.Long(), 0)
-    elif isinstance(t, jvm.Double):
-        return jvm.Value(jvm.Double(), 0.0)
+    # elif isinstance(t, jvm.Long):
+    #     return jvm.Value(jvm.Long(), 0)
+    # elif isinstance(t, jvm.Double):
+    #     return jvm.Value(jvm.Double(), 0.0)
     elif isinstance(t, jvm.Char):
         return jvm.Value.char('\x00')
     elif isinstance(t, jvm.Short):
@@ -221,7 +224,7 @@ def step(state: State) -> State | str:
 
 #array length
         case jvm.ArrayLength():
-            arrRef = frame.stack.pop()
+            arrRef = frame.stack.pop() # this is what is causing array failures in dynamic_analyzer
             assert arrRef.type is jvm.Reference(), f"array length needs reference, got {arrRef}"
             arr = state.heap.get[arrRef.value]
             if arr is None:
@@ -541,8 +544,8 @@ def step(state: State) -> State | str:
 
                 # assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
                 # assert v2.type is jvm.Boolean(), f"expected bool, but got {v2}"
-
-            elif isinstance(v1.type, (jvm.Int, jvm.Boolean, jvm.Float, jvm.Double, jvm.Long)):
+            #"""jvm.Boolean""" """jvm.Float, jvm.Double, jvm.Long""" add later
+            elif isinstance(v1.type, jvm.Int ) and isinstance(v2.value, jvm.Int):
                 match cond:
                     case "eq": jump = (v1.value == v2.value)
                     case "ne": jump = (v1.value != v2.value)
@@ -552,6 +555,15 @@ def step(state: State) -> State | str:
                     case "ge": jump = (v1.value >= v2.value)
                     case _:
                         raise NotImplementedError(f"Unknown condition: {cond}")
+                    
+            elif isinstance(v1.type, jvm.Boolean) and isinstance(v2.type, jvm.Boolean):
+                match cond:
+                    case "eq":
+                        jump = (v1.value == v2.value)
+                    case "ne":
+                        jump = (v1.value != v2.value) 
+                    case _:
+                        raise NotImplementedError(f"Boolean only supports eq/ne, got {cond}")       
 
             if jump:
                 frame.pc = PC(frame.pc.method, t)
@@ -570,10 +582,10 @@ def step(state: State) -> State | str:
                         jump = (v1.value is not None)
                     case _:
                         raise NotImplementedError(f"Unknown condition: {cond}")
-            
-            elif isinstance(v1.type, (jvm.Int, jvm.Boolean, jvm.Float, jvm.Double, jvm.Long)):        
+            #add back in later """jvm.Boolean""", """jvm.Float, jvm.Double, jvm.Long"""
+            elif isinstance(v1.type, jvm.Int):        
                 assert v1.type is jvm.Int(), f"expected int, but got {v1}"
-                assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
+                #assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
 
                 match cond:
                     case "eq": jump = (v1.value == 0)
@@ -584,7 +596,16 @@ def step(state: State) -> State | str:
                     case "ge": jump = (v1.value >= 0)
                     case _:
                         raise NotImplementedError(f"Unknown condition: {cond}")
-
+                    
+            elif isinstance(v1.type, jvm.Boolean):
+                match cond:
+                    case "eq":
+                        jump = (v1.value is False)
+                    case "ne":
+                        jump = (v1.value is True)
+                    case _:
+                        raise NotImplementedError(f"Boolean only supports eq/ne for conditionals, got {cond}")
+        
             if jump:
                 frame.pc = PC(frame.pc.method, t)
             else:
@@ -618,46 +639,46 @@ def step(state: State) -> State | str:
                 return state
             else:
                 return "ok"
+          # unecessary since the above retrieves then returns the type  
+        # case jvm.Return(type=jvm.Boolean()):
+        #     v1 = frame.stack.pop()
+        #     state.frames.pop()
+        #     if state.frames:
+        #         frame = state.frames.peek()
+        #         frame.stack.push(v1)
+        #         return state
+        #     else:
+        #         return "ok" 
             
-        case jvm.Return(type=jvm.Boolean()):
-            v1 = frame.stack.pop()
-            state.frames.pop()
-            if state.frames:
-                frame = state.frames.peek()
-                frame.stack.push(v1)
-                return state
-            else:
-                return "ok" 
+        # case jvm.Return(type=jvm.Float()):
+        #     v1 = frame.stack.pop()
+        #     state.frames.pop()
+        #     if state.frames:
+        #         frame = state.frames.peek()
+        #         frame.stack.push(v1)
+        #         return state
+        #     else:
+        #         return "ok" 
             
-        case jvm.Return(type=jvm.Float()):
-            v1 = frame.stack.pop()
-            state.frames.pop()
-            if state.frames:
-                frame = state.frames.peek()
-                frame.stack.push(v1)
-                return state
-            else:
-                return "ok" 
+        # case jvm.Return(type=jvm.Long()):
+        #     v1 = frame.stack.pop()
+        #     state.frames.pop()
+        #     if state.frames:
+        #         frame = state.frames.peek()
+        #         frame.stack.push(v1)
+        #         return state
+        #     else:
+        #         return "ok" 
             
-        case jvm.Return(type=jvm.Long()):
-            v1 = frame.stack.pop()
-            state.frames.pop()
-            if state.frames:
-                frame = state.frames.peek()
-                frame.stack.push(v1)
-                return state
-            else:
-                return "ok" 
-            
-        case jvm.Return(type=jvm.Double()):
-            v1 = frame.stack.pop()
-            state.frames.pop()
-            if state.frames:
-                frame = state.frames.peek()
-                frame.stack.push(v1)
-                return state
-            else:
-                return "ok" 
+        # case jvm.Return(type=jvm.Double()):
+        #     v1 = frame.stack.pop()
+        #     state.frames.pop()
+        #     if state.frames:
+        #         frame = state.frames.peek()
+        #         frame.stack.push(v1)
+        #         return state
+        #     else:
+        #         return "ok" 
                     
 
                  
@@ -813,10 +834,18 @@ def step(state: State) -> State | str:
 # #END ------------------------------------------------------------------------------------
 
 
+frame = Frame.from_method(methodid)
+for i, v in enumerate(input.values):
+    frame.locals[i] = v
 
-
-
-
+state = State({}, Stack.empty().push(frame))
+for x in range(1000):
+    state = step(state)
+    if isinstance(state, str):
+        print(state)
+        break
+else:
+    print("*")
 
 
 

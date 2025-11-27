@@ -5,73 +5,52 @@ from interpreter import Frame, State, Stack, step  # your interpreter
 import sys
 
 
-# TODO: Lets only use this class to do the dynamic analyzer.
-# We have agreed on 2 analysis: 
-# 1. Checks if the program runs after debloating (must have)
-# 2. Checks the program based on coverage (nice to have, but if no time, we can omit)
-# TEST with input: Java source file, with NO bloated code (pick some from the Bloated.java and remove bloated code by hand then run analysis)
-# Use random input for test, while the input selector is not available
-# When it's ready, integrate with input selector
-# Expected outcome: check if runs with some test values all return ok final state
-# If not, then flag the function
-
-# ANOTHER TODO: 
-# Check runs with the new types (float, bool, array)
-
-
-# GENERATE VALUES: INT, BOOLEAN, FLOATS, ARRAYS:
-def gen_value(param_type):
-    if isinstance(param_type, jvm.Int) or param_type == "I":
-        return random.randint(-10, 10)
-    elif isinstance(param_type, jvm.Boolean) or param_type == "Z":
-        return random.choice([True, False])
-    elif isinstance(param_type, jvm.Float) or param_type == "F":
-        return random.uniform(-10.0, 10.0)  # generates a float
-    elif isinstance(param_type, list) or param_type == "array":
-        length = random.randint(0, 5)
-        return [random.randint(-10, 10) for _ in range(length)]
-    else:
-        return 0
-
-
-
-
-
-
 
 # FUNCTION IF YOU WANT TO USE RANDOM INPUTS ONLY:
 def run_random_dynamic_analysis(methodid, num_trials=100):
     found_query_behavior = False
 
     for _ in range(num_trials):
-        input_values = [gen_value(param) for param in methodid.extension.params]
+        input_values = []
+
+        for param_type in methodid.extension.params:
+            # Random value for JVM int
+            if isinstance(param_type, jvm.Int) or param_type == "I":
+                val = random.randint(-10, 10)
+            # Random value for JVM boolean
+            elif isinstance(param_type, jvm.Bool) or param_type == "Z":
+                val = random.choice([True, False])
+            else:
+                val = 0
+        input_values.append(val)
+
 
         # Create frame and pre-fill locals
         frame = Frame.from_method(methodid)
 
-        # Fill locals
+        # fill locals with random values
         for i, v in enumerate(input_values):
             if isinstance(v, bool):
                 frame.locals[i] = jvm.Value.int(1 if v else 0)
-            elif isinstance(v, float):
-                frame.locals[i] = jvm.Value.float(v)
-            elif isinstance(v, list):
-                # Example: store array as a reference, depending on JVM representation
-                frame.locals[i] = jvm.Value.array(v)
             else:
                 frame.locals[i] = jvm.Value.int(v)
+
 
         # Run interpreter
         state = State({}, Stack.empty().push(frame))
         for _ in range(1000):
             state = step(state)
-            if isinstance(state, str) and state == "divide by zero":
-                found_query_behavior = True
-                print("divide by zero")
+            if isinstance(state, str):
+                if state == "divide by zero":  # our custom behaviour
+                    found_query_behavior = True
+                    print("divide by zero")
                 break
 
+    # Print results
     print("Params for", methodid.extension.name, ":", methodid.extension.params)
     print(f"{methodid.extension.name}: 100%" if found_query_behavior else f"{methodid.extension.name}: 50%")
+
+
 
 
 
@@ -81,42 +60,57 @@ def run_random_dynamic_analysis(methodid, num_trials=100):
 
 
 # FUNCTION IF YOU WANT TO USE INTERESTING VALUES AND RANDOM INPUTS:
-# Dynamic analysis using interesting values + random fallback
 def run_interesting_dynamic_analysis(methodid, num_trials=100):
     found_query_behavior = False
-    interesting_values = [1, -3, 0]  # Try these first
-    interesting_index = 0
+    dictt = [1, -3, 0]  # Interesting values to try first
+    dictt_index = 0      # Track which value to use next
 
     for _ in range(num_trials):
         input_values = []
 
         for param_type in methodid.extension.params:
-            val, interesting_index = gen_value(param_type, interesting_values, interesting_index)
+            # Use dictt values first
+            if dictt_index < len(dictt):
+                val = dictt[dictt_index]
+                dictt_index += 1
+            else:
+                # Random value for JVM int
+                if isinstance(param_type, jvm.Int) or param_type == "I":
+                    val = random.randint(-10, 10)
+                # Random value for JVM boolean
+                elif isinstance(param_type, jvm.Bool) or param_type == "Z":
+                    val = random.choice([True, False])
+                else:
+                    val = 0
             input_values.append(val)
+
 
         # Create frame and pre-fill locals
         frame = Frame.from_method(methodid)
+
+        # fill locals with random values
         for i, v in enumerate(input_values):
             if isinstance(v, bool):
                 frame.locals[i] = jvm.Value.int(1 if v else 0)
-            elif isinstance(v, float):
-                frame.locals[i] = jvm.Value.float(v)
-            elif isinstance(v, list):
-                frame.locals[i] = jvm.Value.array(v)  # adjust depending on your JVM array type
             else:
                 frame.locals[i] = jvm.Value.int(v)
+
 
         # Run interpreter
         state = State({}, Stack.empty().push(frame))
         for _ in range(1000):
             state = step(state)
-            if isinstance(state, str) and state == "divide by zero":
-                found_query_behavior = True
-                print("divide by zero")
+            if isinstance(state, str):
+                if state == "divide by zero":  # your custom behaviour
+                    found_query_behavior = True
+                    print("divide by zero")
                 break
 
+    # Print results
     print("Params for", methodid.extension.name, ":", methodid.extension.params)
     print(f"{methodid.extension.name}: 100%" if found_query_behavior else f"{methodid.extension.name}: 50%")
+
+
 
 
 
@@ -146,7 +140,7 @@ def run_smallcheck_dynamic_analysis(methodid, num_trials=100):
                 if isinstance(param_type, jvm.Int) or param_type == "I":
                     # may raise StopIteration when exhausted
                     input_values.append(next(int_gen))
-                elif isinstance(param_type, jvm.Boolean) or param_type == "Z":
+                elif isinstance(param_type, jvm.Bool) or param_type == "Z":
                     input_values.append(random.choice([True, False]))
                 else:
                     input_values.append(0)
@@ -193,37 +187,53 @@ def run_smallcheck_dynamic_analysis(methodid, num_trials=100):
 
 # FUNCTION FOR IF YOU WANT TO GET THE COVERAGE:
 def run_coverage_guided_analysis(methodid, num_trials=100):
+
+    # Start with an empty byte-string as the first test case
     interesting = [b""]
-    coverage_seen = set()
-
-
+    coverage_seen = set()  # Track bytecode offsets executed
 
     for _ in range(num_trials):
+
         if interesting:
             test_case = interesting.pop(0)
         else:
+            # fallback: generate a random seed
             test_case = bytes([random.randint(0, 255)])
 
+
+        # Mutate it: change, append, or remove a byte
         mutated_cases = []
         for i in range(len(test_case)):
             mutated = bytearray(test_case)
             mutated[i] = random.randint(0, 255)
-            mutated_cases.append(bytes(mutated))
+            # Another method for coverage is appening: mutated_cases.append(bytes(mutated))
+            mutated_cases.append(bytes(mutated))  # Turn them back to bytes and add them in an array
+        
+        #Another method if you want to remove last byte:
+        # if len(test_case) > 0:
+        #     mutated_cases.append(test_case[:-1])  # remove
 
         for mutated in mutated_cases:
-            input_values = [gen_value(param_type) for param_type in methodid.extension.params]
+            # Convert bytes to input values for the method
+            input_values = []
+            for param_type in methodid.extension.params:
+                if isinstance(param_type, jvm.Int) or param_type == "I":
+                    val = mutated[0] if mutated else 0
+                elif isinstance(param_type, jvm.Bool) or param_type == "Z":
+                    val = bool(mutated[0] % 2) if mutated else False   
+                else:
+                    val = 0
+                input_values.append(val)
 
+            # Create frame and fill locals
             frame = Frame.from_method(methodid)
             for i, v in enumerate(input_values):
                 if isinstance(v, bool):
                     frame.locals[i] = jvm.Value.int(1 if v else 0)
-                elif isinstance(v, float):
-                    frame.locals[i] = jvm.Value.float(v)
-                elif isinstance(v, list):
-                    frame.locals[i] = jvm.Value.array(v)
                 else:
                     frame.locals[i] = jvm.Value.int(v)
 
+            # Run interpreter
             state = State({}, Stack.empty().push(frame))
             for _ in range(1000):
                 state = step(state)  # advance the frame first
@@ -242,7 +252,11 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
                         print("divide by zero")
                     break
 
-    print(f"{methodid.extension.name} coverage-guided: {len(coverage_seen)} offsets seen, paths: {coverage_seen}")
+                
+
+    print(f"{methodid.extension.name} coverage-guided: {len(coverage_seen)} offsets seen, and {coverage_seen} are the paths it took")
+
+
 
 
 
@@ -252,7 +266,7 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
 
 import builtins
 
-if __name__ == "__main__":
+if __name__ == "_main_":
     methodid, input = jpamb.getcase()
 
     choice = builtins.input("Choose analysis type (random / interesting / smallcheck / coverage): ").strip().lower()
@@ -266,7 +280,3 @@ if __name__ == "__main__":
         run_smallcheck_dynamic_analysis(methodid, num_trials=100)
     else:
         print("Not a choice")
-
-
-
-
