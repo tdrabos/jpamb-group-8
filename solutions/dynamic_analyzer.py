@@ -27,7 +27,7 @@ def gen_value(param_type):
         return random.choice([True, False])
     elif isinstance(param_type, jvm.Float) or param_type == "F":
         return random.uniform(-10.0, 10.0)  # generates a float
-    elif isinstance(param_type, list) or param_type == "array":
+    elif isinstance(param_type, jvm.Array) or param_type == "array":
         length = random.randint(0, 5)
         return [random.randint(-10, 10) for _ in range(length)]
     else:
@@ -45,7 +45,7 @@ def run_random_dynamic_analysis(methodid, num_trials=100):
 
     for _ in range(num_trials):
         input_values = [gen_value(param) for param in methodid.extension.params]
-
+    
         # Create frame and pre-fill locals
         frame = Frame.from_method(methodid)
 
@@ -55,9 +55,9 @@ def run_random_dynamic_analysis(methodid, num_trials=100):
                 frame.locals[i] = jvm.Value.int(1 if v else 0)
             elif isinstance(v, float):
                 frame.locals[i] = jvm.Value.float(v)
-            elif isinstance(v, list):
+            elif isinstance(v, jvm.Array):
                 # Example: store array as a reference, depending on JVM representation
-                frame.locals[i] = jvm.Value.array(v)
+                frame.locals[i] = jvm.Value.array(v) # check because this 
             else:
                 frame.locals[i] = jvm.Value.int(v)
 
@@ -219,7 +219,7 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
                     frame.locals[i] = jvm.Value.int(1 if v else 0)
                 elif isinstance(v, float):
                     frame.locals[i] = jvm.Value.float(v)
-                elif isinstance(v, list):
+                elif isinstance(v, jvm.Array):
                     frame.locals[i] = jvm.Value.array(v)
                 else:
                     frame.locals[i] = jvm.Value.int(v)

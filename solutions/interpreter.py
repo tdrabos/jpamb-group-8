@@ -839,6 +839,30 @@ for i, v in enumerate(input.values):
     frame.locals[i] = v
 
 state = State({}, Stack.empty().push(frame))
+#from dimitra
+for i, v in enumerate(input.values):
+    # Convert JVM types to JVM Value objects
+    match v.type:
+        case jvm.Boolean():  # boolean → int
+            v = jvm.Value.int(1 if v.value else 0)
+        case jvm.Int():  # int → JVM Value
+            v = jvm.Value.int(v.value)
+        case jvm.Array():
+            addr = len(state.heap)  # next free heap address
+
+            # Wrap elements properly as JVM values
+            def wrap_element(e):
+                if isinstance(e, int):
+                    return jvm.Value.int(e)
+                elif isinstance(e, bool):
+                    return jvm.Value.int(1 if e else 0)
+                elif isinstance(e, str) and len(e) == 1:
+                    return jvm.Value.char(e)
+                else:
+                    return e  # fallback
+
+            state.heap[addr] = [wrap_element(e) for e in v.value]  # wrap every element
+            v = jvm.Value(jvm.Reference(), addr)  # wrap as reference
 for x in range(1000):
     state = step(state)
     if isinstance(state, str):
