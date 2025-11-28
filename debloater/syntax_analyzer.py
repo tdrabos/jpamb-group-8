@@ -445,7 +445,7 @@ def format_call_graph_tree(call_graph: dict[str, set[str]], roots: list[str]) ->
         dfs(r, "", {r}, lines)
     return "\n".join(lines)
 
-def cfg(main_method_id: str, class_name: str):
+def call_graph(main_method_id: str, class_name: str):
     analyzer = MethodAnalyzer("src/main/java/jpamb/cases", method_id=main_method_id, target_class=class_name)
     result = analyzer.analyze()
     if not result:

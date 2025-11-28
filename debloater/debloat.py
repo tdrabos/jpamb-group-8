@@ -4,7 +4,7 @@ from loguru import logger
 
 from debloater.method_debloater import Debloat
 from debloater.static.abstract_interpreter import static_bytecode_analysis
-from debloater.syntax_analyzer import cfg
+from debloater.syntax_analyzer import call_graph
 from jpamb.jvm.base import AbsMethodID
 
 logger.remove()
@@ -13,7 +13,7 @@ logger.add(sys.stderr, format="[{level}] {message}", level="DEBUG")
 def main_analysis(execute = True, from_main=False):
     if from_main:
         logger.info(f"Running CFG builder - looking for unreferenced functions:")
-        called, not_called = cfg(AbsMethodID.decode("jpamb.cases.BloatedMain.main:()I"), "BloatedMain")
+        called, not_called = call_graph(AbsMethodID.decode("jpamb.cases.BloatedMain.main:()I"), "BloatedMain")
     else:
         called = [
             "jpamb.cases.Bloated.unreachableBranchBasic:(I)I",
