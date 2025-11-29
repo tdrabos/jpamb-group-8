@@ -196,8 +196,24 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
     interesting = [b""]
     coverage_seen = set()
 
-
-
+    def makeJvmArray(rawArray, componentType, state):
+        heapArr = []
+        iterable = list(rawArray) if isinstance(rawArray, str) else rawArray
+        for elem in iterable:
+            if isinstance(componentType, jvm.Char):
+                heapArr.append(jvm.Value.char(elem))
+            elif isinstance(componentType, jvm.Int):
+                heapArr.append(jvm.Value.int(elem))
+            elif isinstance(componentType, jvm.Boolean):
+                heapArr.append(jvm.Value.boolean(elem))
+            elif isinstance(componentType, jvm.Float):
+                heapArr.append(jvm.Value(jvm.Float(), float(elem)))
+            else:    
+                raise NotImplementedError(f"Component type {componentType} not supported ")
+        addr = len(state.heap)
+        state.heap[addr] =heapArr
+        return jvm.Value(jvm.Reference(), addr)
+        
     for _ in range(num_trials):
         if interesting:
             test_case = interesting.pop(0)
@@ -214,17 +230,30 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
             input_values = [gen_value(param_type) for param_type in methodid.extension.params]
 
             frame = Frame.from_method(methodid)
+            state = State({}, Stack.empty().push(frame))
+
             for i, v in enumerate(input_values):
                 if isinstance(v, bool):
                     frame.locals[i] = jvm.Value.int(1 if v else 0)
                 elif isinstance(v, float):
                     frame.locals[i] = jvm.Value.float(v)
-                elif isinstance(v, jvm.Array):
-                    frame.locals[i] = jvm.Value.array(v)
+                elif isinstance(v, list):
+                    if len(v) > 0 and isinstance(v[0], str) and len(v[0]) == 1:
+                        componentType = jvm.Char()
+                    elif len(v) > 0 and isinstance(v[0], int):
+                        componentType = jvm.Int()
+                    elif len(v) > 0 and isinstance(v[0], bool):
+                        componentType = jvm.Boolean()
+                    else:
+                        componentType = jvm.Int()
+                        
+                    frame.locals[i] = makeJvmArray(v, componentType, state)
+                # elif isinstance(v, jvm.Array):
+                #     frame.locals[i] = jvm.Value.array(v)
                 else:
                     frame.locals[i] = jvm.Value.int(v)
 
-            state = State({}, Stack.empty().push(frame))
+            #state = State({}, Stack.empty().push(frame))
             for _ in range(1000):
                 state = step(state)  # advance the frame first
 

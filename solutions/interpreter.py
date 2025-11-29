@@ -119,6 +119,34 @@ def arrayType(t) -> jvm.Value:
         return jvm.Value(jvm.Reference(), None)
     raise NotImplementedError(f"new array default not implemented for type {t}")
 
+#make sure this does make the primitive types by themselves crash
+def wrappingHelper(elem, componentType):
+    if isinstance(elem, jvm.Value):
+        return elem
+    if isinstance(componentType, jvm.Char):
+        if isinstance(elem, str) and len(elem) == 1:
+            return jvm.Value.char(elem)
+        if isinstance(elem, int):
+            return jvm.Value.char(chr(elem))
+    
+    if isinstance(componentType, jvm.Int):
+        return jvm.Value.int(int(elem))
+    if isinstance(componentType, jvm.Boolean):
+        return jvm.Value.boolean(bool(elem))
+    if isinstance(componentType, jvm.Float):
+        return jvm.Value(jvm.Float(), float(elem))
+    if isinstance(componentType, jvm.Short):
+        return jvm.Value(jvm.Short(), int(elem))
+    if isinstance(componentType, jvm.Byte):
+        return jvm.Value(jvm.Byte(), int(elem))
+    
+    #for reference/object arrays, the stack expectes elem to already be a ref (jvm.Value) with reference
+    if isinstance(componentType, jvm.Reference) or isinstance(componentType, jvm.Array):
+        #null 
+        if elem is None:
+            return jvm.Value(jvm.Reference(), None)
+        raise NotImplementedError("Cannot wrap object refences from python values. pass refs of none")
+    raise NotImplementedError(f"wrap for component type {componentType} not implemented")
 """Added mul, add, sub, rem, if, ifz, and store for ints. Not sure if i need NewArray, Dup, ArrayStore, ArrayLoad, ArrayLength, Cast, New, Throw, Goto and/or Invoke """
 def step(state: State) -> State | str:
     assert isinstance(state, State), f"expected frame but got {state}"
@@ -130,6 +158,28 @@ def step(state: State) -> State | str:
         case jvm.Push(value=v):
             #Positiver space: v must always be a JVM value:
             assert isinstance(v,jvm.Value), f"Expected JVM value, got {v!r}"
+
+            #adding special push for arrays
+            if isinstance(v.type, jvm.Array):
+                raw = v.value
+                if raw is not None and not isinstance(raw, int):
+                    compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
+                    if compType is None:
+                        raise RuntimeError(f"cannot determine array component type for allocation")
+                    
+                    # now build the heap array of jvm.Value elements
+                    heapArr = []
+                    if isinstance(raw, str):
+                        iterable = list(raw)
+                    else:
+                        iterable = raw
+                    for elem in iterable:
+                        wrapp = wrappingHelper(elem, compType)
+                        heapArr.append(wrapp)
+                    
+                    addr = len(state.heap)
+                    state.heap[addr] = heapArr
+                    v = jvm.Value(jvm.Reference(), addr)
             frame.stack.push(v)
             frame.pc += 1
             return state
@@ -166,6 +216,7 @@ def step(state: State) -> State | str:
             arr = [default for _ in range(size)]
             state.heap[addr] = arr
 
+            #this is correct since arrays must be stored on the heap/stack as a reference
             frame.stack.push(jvm.Value(jvm.Reference(), addr))
             frame.pc += 1
             return state
@@ -175,13 +226,14 @@ def step(state: State) -> State | str:
             arrRef = frame.stack.pop()
 
             assert index.type is jvm.Int(), f"array index must be int, got {index}"
-            assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
+            assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            #assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
 
             #arr = state.heap.get[arrRef.value]
             arr = state.heap[arrRef.value]
             #assert isinstance(arr, jvm.Value)
             #arr: list[jvm.Value] = state.heap[arrRef.value]
-            if index.value <0 or index.value >= len(arr):
+            if index.value < 0 or index.value >= len(arr):
                 return "array out of bounds"
 
             frame.stack.push(arr[index.value])
@@ -195,7 +247,10 @@ def step(state: State) -> State | str:
             arrRef = frame.stack.pop()
 
             assert index.type is jvm.Int(), f"array index must be int, got {index}"
-            assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
+            
+            # so since arrays are supposed to be stored as references, this 
+            assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            #assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
 
             arr = state.heap[arrRef.value]
             if isinstance(t, jvm.Int):
@@ -225,8 +280,10 @@ def step(state: State) -> State | str:
 #array length
         case jvm.ArrayLength():
             arrRef = frame.stack.pop() # this is what is causing array failures in dynamic_analyzer
-            assert arrRef.type is jvm.Reference(), f"array length needs reference, got {arrRef}"
-            arr = state.heap.get[arrRef.value]
+            assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+
+            #assert arrRef.type is jvm.Reference(), f"array length needs reference, got {arrRef}"
+            arr = state.heap[arrRef.value]
             if arr is None:
                 return "null"
 
