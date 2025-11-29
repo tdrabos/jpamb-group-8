@@ -189,7 +189,7 @@ def ensureArrayIsRef(v: jvm.Value, state: State,) -> jvm.Value:
                         compType = jvm.Int()
                     else: 
                         compType = jvm.Reference()
-                        
+
     iterable = list(raw) if isinstance(raw, str) else raw
     heapArr = [wrappingHelper(elem, compType) for elem in iterable]
 
@@ -267,7 +267,7 @@ def step(state: State) -> State | str:
             arr = [default for _ in range(size)]
             state.heap[addr] = arr
 
-            #this is correct since arrays must be stored on the heap/stack as a reference
+            #this is correct since arrays must be stored on the heap as an object and referenced on the stack 
             frame.stack.push(jvm.Value(jvm.Reference(), addr))
             frame.pc += 1
             return state
@@ -321,7 +321,7 @@ def step(state: State) -> State | str:
             index = frame.stack.pop()
             arrRef = frame.stack.pop()
 
-            assert index.type is jvm.Int(), f"array index must be int, got {index}"
+            #assert index.type is jvm.Int(), f"array index must be int, got {index}"
             
             arrRef = ensureArrayIsRef(arrRef, state)
             # so since arrays are supposed to be stored as references, this 

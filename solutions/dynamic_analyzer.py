@@ -17,21 +17,45 @@ import sys
 
 # ANOTHER TODO: 
 # Check runs with the new types (float, bool, array)
+methodid, input = jpamb.getcase()
+
+frame = Frame.from_method(methodid)
+state = State({}, Stack.empty().push(frame))
 
 
 # GENERATE VALUES: INT, BOOLEAN, FLOATS, ARRAYS:
-def gen_value(param_type):
+def gen_value(param_type, state):
+    if isinstance(param_type, jvm.Array):
+        comp = param_type.component_type
+        length = random.randint(1,5)
+
+        elems = [gen_value(comp, state) for _ in range(length)]
+        addr = len(state.heap)
+        state.heap[addr] = elems
+        return jvm.Value(jvm.Reference(param_type), addr)
+    
     if isinstance(param_type, jvm.Int) or param_type == "I":
         return random.randint(-10, 10)
     elif isinstance(param_type, jvm.Boolean) or param_type == "Z":
         return random.choice([True, False])
     elif isinstance(param_type, jvm.Float) or param_type == "F":
         return random.uniform(-10.0, 10.0)  # generates a float
-    elif isinstance(param_type, jvm.Array) or param_type == "array":
-        length = random.randint(0, 5)
-        return [random.randint(-10, 10) for _ in range(length)]
-    else:
-        return 0
+    # elif isinstance(param_type, jvm.Array) or param_type == "array":
+    #     length = random.randint(0, 5)
+# this isnt generic this is a hard coded example    
+    # elif param_type == "[C":
+    #     chars = ['h', 'e', 'l', 'l', 'o']
+    #     heap_arr = [jvm.Value(jvm.Char(), c) for c in chars]
+    #     addr = len(state.heap)
+    #     state.heap[addr] = heap_arr
+        #return jvm.Value(jvm.Reference(jvm.Array(jvm.Char())), addr)
+    elif isinstance(param_type, jvm.Reference):
+        return jvm.Value(jvm.Reference(), None)
+    
+    return jvm.Value.int( 0)
+    #     return [random.randint(-10, 10) for _ in range(length)]
+    # else:
+    #     return 0
 
 
 
@@ -187,7 +211,25 @@ def run_smallcheck_dynamic_analysis(methodid, num_trials=100):
 
 
 
-
+def makeJvmArray(rawArray, componentType, state):
+    heapArr = []
+        #iterable = list(rawArray) if isinstance(rawArray, str) else rawArray
+    for elem in rawArray:
+        if isinstance(componentType, jvm.Char):
+            heapArr.append(jvm.Value.char(elem))
+        elif isinstance(componentType, jvm.Int):
+            heapArr.append(jvm.Value.int(elem))
+        elif isinstance(componentType, jvm.Boolean):
+            heapArr.append(jvm.Value.boolean(elem))
+        elif isinstance(componentType, jvm.Float):
+            heapArr.append(jvm.Value(jvm.Float(), float(elem)))
+        else:    
+            raise NotImplementedError(f"Component type {componentType} not supported ")
+    addr = len(state.heap)
+    state.heap[addr] =heapArr
+        #checking if the loading of arrays from the dynamic_analyzer is the problem
+    #print("DEBUGGING Heap keys:", list(state.heap.keys()), "addr:", addr, "heapArr:", heapArr)
+    return jvm.Value(jvm.Reference(jvm.Array(componentType)), addr)
 
 
 
@@ -209,27 +251,42 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
         elif isinstance(firstElem, float):
             return jvm.Float()
         else:
-            raise NotImplementedError(f"cannot get component type for {firstElem}")
+            raise NotImplementedError(f"Cannot determine array type from {firstElem}")
 
-    def makeJvmArray(rawArray, componentType, state):
-        heapArr = []
-        iterable = list(rawArray) if isinstance(rawArray, str) else rawArray
-        for elem in iterable:
-            if isinstance(componentType, jvm.Char):
-                heapArr.append(jvm.Value.char(elem))
-            elif isinstance(componentType, jvm.Int):
-                heapArr.append(jvm.Value.int(elem))
-            elif isinstance(componentType, jvm.Boolean):
-                heapArr.append(jvm.Value.boolean(elem))
-            elif isinstance(componentType, jvm.Float):
-                heapArr.append(jvm.Value(jvm.Float(), float(elem)))
-            else:    
-                raise NotImplementedError(f"Component type {componentType} not supported ")
-        addr = len(state.heap)
-        state.heap[addr] =heapArr
-        #checking if the loading of arrays from the dynamic_analyzer is the problem
-        print("DEBUGGING Heap keys:", list(state.heap.keys()), "addr:", addr, "heapArr:", heapArr)
-        return jvm.Value(jvm.Reference(), addr)
+    # def getComponentType(v):
+    #     if len(v) == 0:
+    #         return jvm.Int()
+    #     firstElem = v[0]
+    #     if isinstance(firstElem, str) and len(firstElem) == 1:
+    #         return jvm.Char()
+    #     elif isinstance(firstElem, int):
+    #         return jvm.Int()
+    #     elif isinstance(firstElem, bool):
+    #         return jvm.Boolean()
+    #     elif isinstance(firstElem, float):
+    #         return jvm.Float()
+    #     else:
+    #         raise NotImplementedError(f"cannot get component type for {firstElem}")
+
+    # def makeJvmArray(rawArray, componentType, state):
+    #     heapArr = []
+    #     iterable = list(rawArray) if isinstance(rawArray, str) else rawArray
+    #     for elem in iterable:
+    #         if isinstance(componentType, jvm.Char):
+    #             heapArr.append(jvm.Value.char(elem))
+    #         elif isinstance(componentType, jvm.Int):
+    #             heapArr.append(jvm.Value.int(elem))
+    #         elif isinstance(componentType, jvm.Boolean):
+    #             heapArr.append(jvm.Value.boolean(elem))
+    #         elif isinstance(componentType, jvm.Float):
+    #             heapArr.append(jvm.Value(jvm.Float(), float(elem)))
+    #         else:    
+    #             raise NotImplementedError(f"Component type {componentType} not supported ")
+    #     addr = len(state.heap)
+    #     state.heap[addr] =heapArr
+    #     #checking if the loading of arrays from the dynamic_analyzer is the problem
+    #     print("DEBUGGING Heap keys:", list(state.heap.keys()), "addr:", addr, "heapArr:", heapArr)
+    #     return jvm.Value(jvm.Reference(), addr)
         
     for _ in range(num_trials):
         if interesting:
@@ -244,51 +301,64 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
             mutated_cases.append(bytes(mutated))
 
         for mutated in mutated_cases:
-            input_values = [gen_value(param_type) for param_type in methodid.extension.params]
-
             frame = Frame.from_method(methodid)
             state = State({}, Stack.empty().push(frame))
+            
+            input_values = [gen_value(param_type) for param_type in methodid.extension.params]
 
             for i, v in enumerate(input_values):
                 if isinstance(v, bool):
                     frame.locals[i] = jvm.Value.int(1 if v else 0)
                 elif isinstance(v, float):
                     frame.locals[i] = jvm.Value.float(v)
+                elif isinstance(v, jvm.Value) and isinstance(v.type, jvm.Reference):
+                    frame.locals[i] = v
                 elif isinstance(v, list):
-                    if len(v) > 0:
-                        firstElem = v[0]
-                        if isinstance(firstElem, str) and len(firstElem) == 1:
-                            componentType = jvm.Char()
-                        elif isinstance(firstElem, int):
-                            componentType = jvm.Int()
-                        elif isinstance(firstElem, bool):
-                            componentType = jvm.Boolean()
-                        elif isinstance(firstElem, float):
-                            componentType = jvm.Float()
-                        else:
-                            componentType = jvm.Reference()
-                    else:
-                        componentType = jvm.Int()
-                    heapArr = []
-                    for elem in v:
-                        if isinstance(componentType, jvm.Char):
-                            heapArr.append(jvm.Value.char(elem))
-                        elif isinstance(componentType, jvm.Int):
-                            heapArr.append(jvm.Value.int(elem))
-                        elif isinstance(componentType, jvm.Boolean):
-                            heapArr.append(jvm.Value.boolean(elem))
-                        elif isinstance(componentType, jvm.Float):
-                            heapArr.append(jvm.Value(jvm.Float(), float(elem)))
-                        elif isinstance(componentType, jvm.Reference):
-            # For reference/object types, elem must already be a jvm.Value or None
-                            if elem is None: 
-                                heapArr.append(jvm.Value(jvm.Reference(), None))
-                            elif isinstance(elem, jvm.Value):
-                                heapArr.append(elem)
-                            else:
-                                raise NotImplementedError(f"Cannot wrap object element {elem}")
-                        else:
-                            raise NotImplementedError(f"Component type {componentType} not supported")
+                    comp_type = getComponentType(v)
+                    frame.locals[i] = makeJvmArray(v, comp_type, state)
+                else:
+                    frame.locals[i] = jvm.Value.int(v)
+                # elif isinstance(v, list):
+                #     if len(v) > 0:
+                #         firstElem = v[0]
+                #         if isinstance(firstElem, str) and len(firstElem) == 1:
+                #             componentType = jvm.Char()
+                #         elif isinstance(firstElem, int):
+                #             componentType = jvm.Int()
+                #         elif isinstance(firstElem, bool):
+                #             componentType = jvm.Boolean()
+                #         elif isinstance(firstElem, float):
+                #             componentType = jvm.Float()
+                #         else:
+                #             componentType = jvm.Reference()
+                #     else:
+                #         componentType = jvm.Int()
+                # elif isinstance(v, list):
+                #     componentType = componentType(v)
+                #     frame.locals[i] = makeJvmArray(v, componentType, state)
+                # else: 
+                #     frame.locals[i] = jvm.Value.int(v)
+
+            #         heapArr = []
+            #         for elem in v:
+            #             if isinstance(componentType, jvm.Char):
+            #                 heapArr.append(jvm.Value.char(elem))
+            #             elif isinstance(componentType, jvm.Int):
+            #                 heapArr.append(jvm.Value.int(elem))
+            #             elif isinstance(componentType, jvm.Boolean):
+            #                 heapArr.append(jvm.Value.boolean(elem))
+            #             elif isinstance(componentType, jvm.Float):
+            #                 heapArr.append(jvm.Value(jvm.Float(), float(elem)))
+            #             elif isinstance(componentType, jvm.Reference):
+            # # For reference/object types, elem must already be a jvm.Value or None
+            #                 if elem is None: 
+            #                     heapArr.append(jvm.Value(jvm.Reference(), None))
+            #                 elif isinstance(elem, jvm.Value):
+            #                     heapArr.append(elem)
+            #                 else:
+            #                     raise NotImplementedError(f"Cannot wrap object element {elem}")
+            #             else:
+            #                 raise NotImplementedError(f"Component type {componentType} not supported")
                     # if len(v) > 0 and isinstance(v[0], str) and len(v[0]) == 1:
                     #     componentType = jvm.Char()
                     # elif len(v) > 0 and isinstance(v[0], int):
@@ -297,9 +367,9 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
                     #     componentType = jvm.Boolean()
                     # else:
                     #     componentType = jvm.Int()
-                    addr = len(state.heap)
-                    state.heap[addr] = heapArr
-                    frame.locals[i] = jvm.Value(jvm.Reference(), addr)
+                    # addr = len(state.heap)
+                    # state.heap[addr] = heapArr
+                    # frame.locals[i] = jvm.Value(jvm.Reference(), addr)
                     #frame.locals[i] = makeJvmArray(v, componentType, state)
                 # elif isinstance(v, jvm.Array):
                 #     frame.locals[i] = jvm.Value.array(v)
