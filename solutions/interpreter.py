@@ -147,6 +147,56 @@ def wrappingHelper(elem, componentType):
             return jvm.Value(jvm.Reference(), None)
         raise NotImplementedError("Cannot wrap object refences from python values. pass refs of none")
     raise NotImplementedError(f"wrap for component type {componentType} not implemented")
+
+def ensureArrayIsRef(v: jvm.Value, state: State,) -> jvm.Value:
+    if isinstance(v.type, jvm.Reference) or v.type is jvm.Reference():
+        return v
+    if not isinstance(v.type, jvm.Array):
+        return v
+    raw = v.value
+    if raw is None:
+        return jvm.Value(jvm.Reference(), None)
+    
+    names = ["componentType", "component_type", "t", "elem", "element_type", "elementType", "component", "atype", "base"]
+    compType = getattr(v.type, "componentType", None)\
+        or getattr(v.type, "component_type", None) \
+        or getattr(v.type, "t", None)
+    compType = None
+    for name in names:
+    #if compType is None:
+        compType = getattr(v.type, name, None)
+        if compType is not None:
+            break
+        if compType is None:
+            
+        #raise RuntimeError(f"Cannot determine type for array")
+            iterable = list(raw) if isinstance(raw, str) else raw
+            first = None
+            for x in iterable:
+                if x is not None:
+                    first = x
+                    break
+                if first is None:
+                    compType = jvm.Int()
+                else:
+                    if isinstance(first, str) and len(first) == 1:
+                        compType = jvm.Char()
+                    if isinstance(first, bool) and len(first) == 1:
+                        compType = jvm.Boolean()
+                    if isinstance(first, float) and len(first) == 1:
+                        compType = jvm.Float()
+                    if isinstance(first, int) and len(first) == 1:
+                        compType = jvm.Int()
+                    else: 
+                        compType = jvm.Reference()
+                        
+    iterable = list(raw) if isinstance(raw, str) else raw
+    heapArr = [wrappingHelper(elem, compType) for elem in iterable]
+
+    addr = len(state.heap)
+    state.heap[addr]=heapArr
+    return jvm.Value(jvm.Reference(), addr)
+
 """Added mul, add, sub, rem, if, ifz, and store for ints. Not sure if i need NewArray, Dup, ArrayStore, ArrayLoad, ArrayLength, Cast, New, Throw, Goto and/or Invoke """
 def step(state: State) -> State | str:
     assert isinstance(state, State), f"expected frame but got {state}"
@@ -160,26 +210,27 @@ def step(state: State) -> State | str:
             assert isinstance(v,jvm.Value), f"Expected JVM value, got {v!r}"
 
             #adding special push for arrays
-            if isinstance(v.type, jvm.Array):
-                raw = v.value
-                if raw is not None and not isinstance(raw, int):
-                    compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
-                    if compType is None:
-                        raise RuntimeError(f"cannot determine array component type for allocation")
+            v = ensureArrayIsRef(v, state)
+            # if isinstance(v.type, jvm.Array):
+            #     raw = v.value
+            #     if raw is not None and not isinstance(raw, int):
+            #         compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
+            #         if compType is None:
+            #             raise RuntimeError(f"cannot determine array component type for allocation")
                     
-                    # now build the heap array of jvm.Value elements
-                    heapArr = []
-                    if isinstance(raw, str):
-                        iterable = list(raw)
-                    else:
-                        iterable = raw
-                    for elem in iterable:
-                        wrapp = wrappingHelper(elem, compType)
-                        heapArr.append(wrapp)
+            #         # now build the heap array of jvm.Value elements
+            #         heapArr = [wrappingHelper(elem, compType) for elem in raw]
+            #         if isinstance(raw, str):
+            #             iterable = list(raw)
+            #         else:
+            #             iterable = raw
+            #         for elem in iterable:
+            #             wrapp = wrappingHelper(elem, compType)
+            #             heapArr.append(wrapp)
                     
-                    addr = len(state.heap)
-                    state.heap[addr] = heapArr
-                    v = jvm.Value(jvm.Reference(), addr)
+            #         addr = len(state.heap)
+            #         state.heap[addr] = heapArr
+            #         v = jvm.Value(jvm.Reference(), addr)
             frame.stack.push(v)
             frame.pc += 1
             return state
@@ -226,10 +277,34 @@ def step(state: State) -> State | str:
             arrRef = frame.stack.pop()
 
             assert index.type is jvm.Int(), f"array index must be int, got {index}"
-            assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            #assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            arrRef = ensureArrayIsRef(arrRef, state)
+            assert isinstance(arrRef.type, jvm.jvm.Reference) or arrRef.type is jvm.Reference(), f"expected ref, got {arrRef}"
+
             #assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
 
             #arr = state.heap.get[arrRef.value]
+            
+            # if isinstance(v.type, jvm.Array):
+            #     raw = v.value
+            #     if raw is not None and not isinstance(raw, int):
+            #         compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
+            #         if compType is None:
+            #             raise RuntimeError(f"cannot determine array component type for allocation")
+                    
+            #         # now build the heap array of jvm.Value elements
+            #         heapArr = [wrappingHelper(elem, compType) for elem in raw]
+            #         if isinstance(raw, str):
+            #             iterable = list(raw)
+            #         else:
+            #             iterable = raw
+            #         for elem in iterable:
+            #             wrapp = wrappingHelper(elem, compType)
+            #             heapArr.append(wrapp)
+                    
+            #         addr = len(state.heap)
+            #         state.heap[addr] = heapArr
+            #         v = jvm.Value(jvm.Reference(), addr)
             arr = state.heap[arrRef.value]
             #assert isinstance(arr, jvm.Value)
             #arr: list[jvm.Value] = state.heap[arrRef.value]
@@ -248,10 +323,32 @@ def step(state: State) -> State | str:
 
             assert index.type is jvm.Int(), f"array index must be int, got {index}"
             
+            arrRef = ensureArrayIsRef(arrRef, state)
             # so since arrays are supposed to be stored as references, this 
-            assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
-            #assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
+            #assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            assert isinstance(arrRef.type, jvm.Reference) or arrRef.type is jvm.Reference(), f"expected ref, got {arrRef}"
 
+            #assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
+            # if isinstance(v.type, jvm.Array):
+            #     raw = v.value
+            #     if raw is not None and not isinstance(raw, int):
+            #         compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
+            #         if compType is None:
+            #             raise RuntimeError(f"cannot determine array component type for allocation")
+                    
+            #         # now build the heap array of jvm.Value elements
+            #         heapArr = [wrappingHelper(elem, compType) for elem in raw]
+            #         if isinstance(raw, str):
+            #             iterable = list(raw)
+            #         else:
+            #             iterable = raw
+            #         for elem in iterable:
+            #             wrapp = wrappingHelper(elem, compType)
+            #             heapArr.append(wrapp)
+                    
+            #         addr = len(state.heap)
+            #         state.heap[addr] = heapArr
+            #         v = jvm.Value(jvm.Reference(), addr)
             arr = state.heap[arrRef.value]
             if isinstance(t, jvm.Int):
                 assert value.type is jvm.Int(), f"expected int element, got {value}"
@@ -280,8 +377,31 @@ def step(state: State) -> State | str:
 #array length
         case jvm.ArrayLength():
             arrRef = frame.stack.pop() # this is what is causing array failures in dynamic_analyzer
-            assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            arrRef = ensureArrayIsRef(arrRef, state)
+            #assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            assert isinstance(arrRef.type, jvm.Reference), f"expected ref, got {arrRef}"
 
+
+            # if isinstance(v.type, jvm.Array):
+            #     raw = v.value
+            #     if raw is not None and not isinstance(raw, int):
+            #         compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
+            #         if compType is None:
+            #             raise RuntimeError(f"cannot determine array component type for allocation")
+                    
+            #         # now build the heap array of jvm.Value elements
+            #         heapArr = [wrappingHelper(elem, compType) for elem in raw]
+            #         if isinstance(raw, str):
+            #             iterable = list(raw)
+            #         else:
+            #             iterable = raw
+            #         for elem in iterable:
+            #             wrapp = wrappingHelper(elem, compType)
+            #             heapArr.append(wrapp)
+                    
+            #         addr = len(state.heap)
+            #         state.heap[addr] = heapArr
+            #         v = jvm.Value(jvm.Reference(), addr)
             #assert arrRef.type is jvm.Reference(), f"array length needs reference, got {arrRef}"
             arr = state.heap[arrRef.value]
             if arr is None:

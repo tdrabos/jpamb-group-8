@@ -196,6 +196,21 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
     interesting = [b""]
     coverage_seen = set()
 
+    def getComponentType(v):
+        if len(v) == 0:
+            return jvm.Int()
+        firstElem = v[0]
+        if isinstance(firstElem, str) and len(firstElem) == 1:
+            return jvm.Char()
+        elif isinstance(firstElem, int):
+            return jvm.Int()
+        elif isinstance(firstElem, bool):
+            return jvm.Boolean()
+        elif isinstance(firstElem, float):
+            return jvm.Float()
+        else:
+            raise NotImplementedError(f"cannot get component type for {firstElem}")
+
     def makeJvmArray(rawArray, componentType, state):
         heapArr = []
         iterable = list(rawArray) if isinstance(rawArray, str) else rawArray
@@ -212,6 +227,8 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
                 raise NotImplementedError(f"Component type {componentType} not supported ")
         addr = len(state.heap)
         state.heap[addr] =heapArr
+        #checking if the loading of arrays from the dynamic_analyzer is the problem
+        print("DEBUGGING Heap keys:", list(state.heap.keys()), "addr:", addr, "heapArr:", heapArr)
         return jvm.Value(jvm.Reference(), addr)
         
     for _ in range(num_trials):
@@ -238,20 +255,56 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
                 elif isinstance(v, float):
                     frame.locals[i] = jvm.Value.float(v)
                 elif isinstance(v, list):
-                    if len(v) > 0 and isinstance(v[0], str) and len(v[0]) == 1:
-                        componentType = jvm.Char()
-                    elif len(v) > 0 and isinstance(v[0], int):
-                        componentType = jvm.Int()
-                    elif len(v) > 0 and isinstance(v[0], bool):
-                        componentType = jvm.Boolean()
+                    if len(v) > 0:
+                        firstElem = v[0]
+                        if isinstance(firstElem, str) and len(firstElem) == 1:
+                            componentType = jvm.Char()
+                        elif isinstance(firstElem, int):
+                            componentType = jvm.Int()
+                        elif isinstance(firstElem, bool):
+                            componentType = jvm.Boolean()
+                        elif isinstance(firstElem, float):
+                            componentType = jvm.Float()
+                        else:
+                            componentType = jvm.Reference()
                     else:
                         componentType = jvm.Int()
-                        
-                    frame.locals[i] = makeJvmArray(v, componentType, state)
+                    heapArr = []
+                    for elem in v:
+                        if isinstance(componentType, jvm.Char):
+                            heapArr.append(jvm.Value.char(elem))
+                        elif isinstance(componentType, jvm.Int):
+                            heapArr.append(jvm.Value.int(elem))
+                        elif isinstance(componentType, jvm.Boolean):
+                            heapArr.append(jvm.Value.boolean(elem))
+                        elif isinstance(componentType, jvm.Float):
+                            heapArr.append(jvm.Value(jvm.Float(), float(elem)))
+                        elif isinstance(componentType, jvm.Reference):
+            # For reference/object types, elem must already be a jvm.Value or None
+                            if elem is None: 
+                                heapArr.append(jvm.Value(jvm.Reference(), None))
+                            elif isinstance(elem, jvm.Value):
+                                heapArr.append(elem)
+                            else:
+                                raise NotImplementedError(f"Cannot wrap object element {elem}")
+                        else:
+                            raise NotImplementedError(f"Component type {componentType} not supported")
+                    # if len(v) > 0 and isinstance(v[0], str) and len(v[0]) == 1:
+                    #     componentType = jvm.Char()
+                    # elif len(v) > 0 and isinstance(v[0], int):
+                    #     componentType = jvm.Int()
+                    # elif len(v) > 0 and isinstance(v[0], bool):
+                    #     componentType = jvm.Boolean()
+                    # else:
+                    #     componentType = jvm.Int()
+                    addr = len(state.heap)
+                    state.heap[addr] = heapArr
+                    frame.locals[i] = jvm.Value(jvm.Reference(), addr)
+                    #frame.locals[i] = makeJvmArray(v, componentType, state)
                 # elif isinstance(v, jvm.Array):
                 #     frame.locals[i] = jvm.Value.array(v)
-                else:
-                    frame.locals[i] = jvm.Value.int(v)
+                # else:
+                #     frame.locals[i] = jvm.Value.int(v)
 
             #state = State({}, Stack.empty().push(frame))
             for _ in range(1000):
