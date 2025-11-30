@@ -49,7 +49,6 @@
         "lines": [
           {
             "line": 8,
-            "line": 8,
             "offset": 0
           }
         ],
@@ -207,23 +206,9 @@
             "value": {
               "type": "integer",
               "value": 0
-              "value": 0
             }
           },
           {
-            "access": "static",
-            "method": {
-              "args": [
-                "int"
-              ],
-              "is_interface": false,
-              "name": "unreachableBranchFor",
-              "ref": {
-                "kind": "class",
-                "name": "jpamb/cases/Bloated"
-              },
-              "returns": "int"
-            },
             "access": "static",
             "method": {
               "args": [
@@ -242,15 +227,10 @@
           },
           {
             "offset": 30,
-            "opr": "invoke"
-          },
-          {
-            "offset": 30,
             "opr": "return",
             "type": "int"
           },
           {
-            "offset": 31,
             "offset": 31,
             "opr": "push",
             "value": {
@@ -260,7 +240,6 @@
           },
           {
             "offset": 32,
-            "offset": 32,
             "opr": "return",
             "type": "int"
           }
@@ -269,47 +248,37 @@
         "lines": [
           {
             "line": 10,
-            "line": 10,
             "offset": 0
           },
           {
-            "line": 11,
             "line": 11,
             "offset": 2
           },
           {
             "line": 14,
-            "line": 14,
             "offset": 6
           },
           {
-            "line": 15,
             "line": 15,
             "offset": 8
           },
           {
             "line": 17,
-            "line": 17,
             "offset": 12
           },
           {
-            "line": 18,
             "line": 18,
             "offset": 14
           },
           {
             "line": 19,
-            "line": 19,
             "offset": 16
           },
           {
             "line": 22,
-            "line": 22,
             "offset": 20
           },
           {
-            "line": 24,
-            "offset": 23
             "line": 24,
             "offset": 23
           }
@@ -326,7 +295,6 @@
             "type": "same"
           },
           {
-            "index": 23,
             "index": 23,
             "type": "same"
           }
@@ -394,11 +362,9 @@
         "lines": [
           {
             "line": 28,
-            "line": 28,
             "offset": 0
           },
           {
-            "line": 30,
             "line": 30,
             "offset": 2
           }
@@ -566,7 +532,6 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 34,
             "line": 34,
             "offset": 0
           },
@@ -850,7 +815,7 @@
             "offset": 21
           },
           {
-            "line": 61,
+            "line": 58,
             "offset": 23
           }
         ],
@@ -1154,31 +1119,31 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 65,
+            "line": 62,
             "offset": 0
           },
           {
-            "line": 66,
+            "line": 63,
             "offset": 2
           },
           {
-            "line": 68,
+            "line": 65,
             "offset": 25
           },
           {
-            "line": 69,
+            "line": 66,
             "offset": 29
           },
           {
-            "line": 70,
+            "line": 67,
             "offset": 30
           },
           {
-            "line": 73,
+            "line": 70,
             "offset": 32
           },
           {
-            "line": 76,
+            "line": 73,
             "offset": 36
           }
         ],
@@ -1252,7 +1217,7 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 80,
+            "line": 77,
             "offset": 0
           }
         ],
