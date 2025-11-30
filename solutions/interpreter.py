@@ -5,10 +5,15 @@ from jpamb.jvm.base import MethodID
 import sys
 from loguru import logger
 import random
+from jpamb.jvm.base import MethodID
+from jpamb.jvm.opcode import CompareFloating
+#import jpamb.jvm.opcode as jvm
+import math
 
 logger.remove()
 logger.add(sys.stderr, format="[{level}] {message}")
 
+# methodid, input = jpamb.getcase()
 
 @dataclass(frozen=True, slots=True)
 class PC:
@@ -86,9 +91,10 @@ class Frame:
 class State:
     heap: dict[int, jvm.Value]
     frames: Stack[Frame]
+    #interpreter: object
 
     def __str__(self):
-        return f"{self.heap} {self.frames}"
+        return f"{self.heap} {self.frames} " #{self.interpreter}
     
 # def newHeapAddr(heap: dict[int, list[jvm.Value]]) -> int:
 #     if not heap:
@@ -102,10 +108,10 @@ def arrayType(t) -> jvm.Value:
         return jvm.Value.boolean(False)
     elif isinstance(t,jvm.Float):
         return jvm.Value(jvm.Float(), 0.0)
-    elif isinstance(t, jvm.Long):
-        return jvm.Value(jvm.Long(), 0)
-    elif isinstance(t, jvm.Double):
-        return jvm.Value(jvm.Double(), 0.0)
+    # elif isinstance(t, jvm.Long):
+    #     return jvm.Value(jvm.Long(), 0)
+    # elif isinstance(t, jvm.Double):
+    #     return jvm.Value(jvm.Double(), 0.0)
     elif isinstance(t, jvm.Char):
         return jvm.Value.char('\x00')
     elif isinstance(t, jvm.Short):
@@ -115,6 +121,84 @@ def arrayType(t) -> jvm.Value:
     elif isinstance(t, jvm.Reference):
         return jvm.Value(jvm.Reference(), None)
     raise NotImplementedError(f"new array default not implemented for type {t}")
+
+#make sure this does make the primitive types by themselves crash
+def wrappingHelper(elem, componentType):
+    if isinstance(elem, jvm.Value):
+        return elem
+    if isinstance(componentType, jvm.Char):
+        if isinstance(elem, str) and len(elem) == 1:
+            return jvm.Value.char(elem)
+        if isinstance(elem, int):
+            return jvm.Value.char(chr(elem))
+    
+    if isinstance(componentType, jvm.Int):
+        return jvm.Value.int(int(elem))
+    if isinstance(componentType, jvm.Boolean):
+        return jvm.Value.boolean(bool(elem))
+    if isinstance(componentType, jvm.Float):
+        return jvm.Value(jvm.Float(), float(elem))
+    if isinstance(componentType, jvm.Short):
+        return jvm.Value(jvm.Short(), int(elem))
+    if isinstance(componentType, jvm.Byte):
+        return jvm.Value(jvm.Byte(), int(elem))
+    
+    #for reference/object arrays, the stack expectes elem to already be a ref (jvm.Value) with reference
+    if isinstance(componentType, jvm.Reference) or isinstance(componentType, jvm.Array):
+        #null 
+        if elem is None:
+            return jvm.Value(jvm.Reference(), None)
+        raise NotImplementedError("Cannot wrap object refences from python values. pass refs of none")
+    raise NotImplementedError(f"wrap for component type {componentType} not implemented")
+
+def ensureArrayIsRef(v: jvm.Value, state: State,) -> jvm.Value:
+    if isinstance(v.type, jvm.Reference) or v.type is jvm.Reference():
+        return v
+    if not isinstance(v.type, jvm.Array):
+        return v
+    raw = v.value
+    if raw is None:
+        return jvm.Value(jvm.Reference(), None)
+    
+    names = ["componentType", "component_type", "t", "elem", "element_type", "elementType", "component", "atype", "base"]
+    compType = getattr(v.type, "componentType", None)\
+        or getattr(v.type, "component_type", None) \
+        or getattr(v.type, "t", None)
+    compType = None
+    for name in names:
+    #if compType is None:
+        compType = getattr(v.type, name, None)
+        if compType is not None:
+            break
+        if compType is None:
+            
+        #raise RuntimeError(f"Cannot determine type for array")
+            iterable = list(raw) if isinstance(raw, str) else raw
+            first = None
+            for x in iterable:
+                if x is not None:
+                    first = x
+                    break
+                if first is None:
+                    compType = jvm.Int()
+                else:
+                    if isinstance(first, str) and len(first) == 1:
+                        compType = jvm.Char()
+                    if isinstance(first, bool) and len(first) == 1:
+                        compType = jvm.Boolean()
+                    if isinstance(first, float) and len(first) == 1:
+                        compType = jvm.Float()
+                    if isinstance(first, int) and len(first) == 1:
+                        compType = jvm.Int()
+                    else: 
+                        compType = jvm.Reference()
+
+    iterable = list(raw) if isinstance(raw, str) else raw
+    heapArr = [wrappingHelper(elem, compType) for elem in iterable]
+
+    addr = len(state.heap)
+    state.heap[addr]=heapArr
+    return jvm.Value(jvm.Reference(), addr)
 
 """Added mul, add, sub, rem, if, ifz, and store for ints. Not sure if i need NewArray, Dup, ArrayStore, ArrayLoad, ArrayLength, Cast, New, Throw, Goto and/or Invoke """
 def step(state: State) -> State | str:
@@ -127,6 +211,29 @@ def step(state: State) -> State | str:
         case jvm.Push(value=v):
             #Positiver space: v must always be a JVM value:
             assert isinstance(v,jvm.Value), f"Expected JVM value, got {v!r}"
+
+            #adding special push for arrays
+            v = ensureArrayIsRef(v, state)
+            # if isinstance(v.type, jvm.Array):
+            #     raw = v.value
+            #     if raw is not None and not isinstance(raw, int):
+            #         compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
+            #         if compType is None:
+            #             raise RuntimeError(f"cannot determine array component type for allocation")
+                    
+            #         # now build the heap array of jvm.Value elements
+            #         heapArr = [wrappingHelper(elem, compType) for elem in raw]
+            #         if isinstance(raw, str):
+            #             iterable = list(raw)
+            #         else:
+            #             iterable = raw
+            #         for elem in iterable:
+            #             wrapp = wrappingHelper(elem, compType)
+            #             heapArr.append(wrapp)
+                    
+            #         addr = len(state.heap)
+            #         state.heap[addr] = heapArr
+            #         v = jvm.Value(jvm.Reference(), addr)
             frame.stack.push(v)
             frame.pc += 1
             return state
@@ -163,6 +270,7 @@ def step(state: State) -> State | str:
             arr = [default for _ in range(size)]
             state.heap[addr] = arr
 
+            #this is correct since arrays must be stored on the heap as an object and referenced on the stack 
             frame.stack.push(jvm.Value(jvm.Reference(), addr))
             frame.pc += 1
             return state
@@ -172,13 +280,38 @@ def step(state: State) -> State | str:
             arrRef = frame.stack.pop()
 
             assert index.type is jvm.Int(), f"array index must be int, got {index}"
-            assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
+            #assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            arrRef = ensureArrayIsRef(arrRef, state)
+            assert isinstance(arrRef.type, jvm.jvm.Reference) or arrRef.type is jvm.Reference(), f"expected ref, got {arrRef}"
+
+            #assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
 
             #arr = state.heap.get[arrRef.value]
+            
+            # if isinstance(v.type, jvm.Array):
+            #     raw = v.value
+            #     if raw is not None and not isinstance(raw, int):
+            #         compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
+            #         if compType is None:
+            #             raise RuntimeError(f"cannot determine array component type for allocation")
+                    
+            #         # now build the heap array of jvm.Value elements
+            #         heapArr = [wrappingHelper(elem, compType) for elem in raw]
+            #         if isinstance(raw, str):
+            #             iterable = list(raw)
+            #         else:
+            #             iterable = raw
+            #         for elem in iterable:
+            #             wrapp = wrappingHelper(elem, compType)
+            #             heapArr.append(wrapp)
+                    
+            #         addr = len(state.heap)
+            #         state.heap[addr] = heapArr
+            #         v = jvm.Value(jvm.Reference(), addr)
             arr = state.heap[arrRef.value]
             #assert isinstance(arr, jvm.Value)
             #arr: list[jvm.Value] = state.heap[arrRef.value]
-            if index.value <0 or index.value >= len(arr):
+            if index.value < 0 or index.value >= len(arr):
                 return "array out of bounds"
 
             frame.stack.push(arr[index.value])
@@ -186,15 +319,43 @@ def step(state: State) -> State | str:
             return state 
         
 #array store 
-        case jvm.ArrayStore(element_type=t):
+        case jvm.ArrayStore(type=t):
             value = frame.stack.pop()
             index = frame.stack.pop()
             arrRef = frame.stack.pop()
 
             assert index.type is jvm.Int(), f"array index must be int, got {index}"
-            assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
+            
+            arrRef = ensureArrayIsRef(arrRef, state)
+            # so since arrays are supposed to be stored as references, this 
+            #assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            assert isinstance(arrRef.type, jvm.Reference) or arrRef.type is jvm.Reference(), f"expected ref, got {arrRef}"
 
+            #assert arrRef.type is jvm.Reference(), f"array ref must be reference, got {arrRef}"
+            # if isinstance(v.type, jvm.Array):
+            #     raw = v.value
+            #     if raw is not None and not isinstance(raw, int):
+            #         compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
+            #         if compType is None:
+            #             raise RuntimeError(f"cannot determine array component type for allocation")
+                    
+            #         # now build the heap array of jvm.Value elements
+            #         heapArr = [wrappingHelper(elem, compType) for elem in raw]
+            #         if isinstance(raw, str):
+            #             iterable = list(raw)
+            #         else:
+            #             iterable = raw
+            #         for elem in iterable:
+            #             wrapp = wrappingHelper(elem, compType)
+            #             heapArr.append(wrapp)
+                    
+            #         addr = len(state.heap)
+            #         state.heap[addr] = heapArr
+            #         v = jvm.Value(jvm.Reference(), addr)
             arr = state.heap[arrRef.value]
+            if isinstance(t, jvm.Boolean) and value.type is jvm.Int():
+                value = jvm.Value.boolean(bool(value.value))
+
             if isinstance(t, jvm.Int):
                 assert value.type is jvm.Int(), f"expected int element, got {value}"
             elif isinstance(t, jvm.Boolean):
@@ -209,21 +370,50 @@ def step(state: State) -> State | str:
                 assert value.type is jvm.Char(), f"expected char element, got {value}"
             elif isinstance(t, jvm.Short):
                 assert value.type is jvm.Short(), f"expected char element, got {value}"
-            elif isinstance(t, jvm.Byte):
-                assert value.type is jvm.Byte(), f"expected byte element, got {value}"
-            else:
+                #taking out since due to storing in array store in opcode boolean and byte are the same so there is confusion with byte in here
+            # elif isinstance(t, jvm.Byte): 
+            #     assert value.type is jvm.Byte(), f"expected byte element, got {value}"
+            # else:
                 assert value.type is jvm.Reference(), f"expected reference element, got {value}"
             # if arr is None:
             #     return "null"
+
             arr[index.value] = value
+            if index.value < 0 or index.value >= len(arr):
+                return "array out of bounds"
             frame.pc += 1
             return state 
 
 #array length
         case jvm.ArrayLength():
-            arrRef = frame.stack.pop()
-            assert arrRef.type is jvm.Reference(), f"array length needs reference, got {arrRef}"
-            arr = state.heap.get[arrRef.value]
+            arrRef = frame.stack.pop() # this is what is causing array failures in dynamic_analyzer
+            arrRef = ensureArrayIsRef(arrRef, state)
+            #assert isinstance(arrRef.type, jvm.Array), f"expected array, got {arrRef}"
+            assert isinstance(arrRef.type, jvm.Reference), f"expected ref, got {arrRef}"
+
+
+            # if isinstance(v.type, jvm.Array):
+            #     raw = v.value
+            #     if raw is not None and not isinstance(raw, int):
+            #         compType = getattr(v.type, "componentType", None) or getattr(v.type, "componenet_type", None) or getattr(v.type, "t", None)
+            #         if compType is None:
+            #             raise RuntimeError(f"cannot determine array component type for allocation")
+                    
+            #         # now build the heap array of jvm.Value elements
+            #         heapArr = [wrappingHelper(elem, compType) for elem in raw]
+            #         if isinstance(raw, str):
+            #             iterable = list(raw)
+            #         else:
+            #             iterable = raw
+            #         for elem in iterable:
+            #             wrapp = wrappingHelper(elem, compType)
+            #             heapArr.append(wrapp)
+                    
+            #         addr = len(state.heap)
+            #         state.heap[addr] = heapArr
+            #         v = jvm.Value(jvm.Reference(), addr)
+            #assert arrRef.type is jvm.Reference(), f"array length needs reference, got {arrRef}"
+            arr = state.heap[arrRef.value]
             if arr is None:
                 return "null"
 
@@ -523,8 +713,27 @@ def step(state: State) -> State | str:
             frame.pc += 1
             return state
         
+        #Special floats
+        case jvm.CompareFloating(offset=_, type=ftype, onnan = onnan):
+            v2, v1 = frame.stack.pop(), frame.stack.pop()
+            assert v1.type is jvm.Float()
+            assert v2.type is jvm.Float()
+
+            # onnan = -1 if dir == "l" else 1
+            # val1, val2 = float(v1.value), float(v2.value)
+
+            if math.isnan(v1.value) or math.isnan(v2.value):
+                result = onnan #-1 if dir == "l" else 1
+            else:
+                result = -1 if v1.value < v2.value else (1 if v1.value > v2.value else 0)
+
+            frame.stack.push(jvm.Value(jvm.Int(), result))
+            frame.pc += 1
+            return state 
+        
 # Conditionals        
         case jvm.If(condition=cond, target=t):
+            jump = False
             v2, v1  = frame.stack.pop(), frame.stack.pop()
             if v1.type is jvm.Reference() and v2.type is jvm.Reference():
                 match cond:
@@ -541,8 +750,8 @@ def step(state: State) -> State | str:
 
                 # assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
                 # assert v2.type is jvm.Boolean(), f"expected bool, but got {v2}"
-
-            elif isinstance(v1.type, (jvm.Int, jvm.Boolean, jvm.Float, jvm.Double, jvm.Long)):
+            #"""jvm.Boolean""" """jvm.Float, jvm.Double, jvm.Long""" add later
+            elif isinstance(v1.type, jvm.Int ) and isinstance(v2.type, jvm.Int):
                 match cond:
                     case "eq": jump = (v1.value == v2.value)
                     case "ne": jump = (v1.value != v2.value)
@@ -552,6 +761,15 @@ def step(state: State) -> State | str:
                     case "ge": jump = (v1.value >= v2.value)
                     case _:
                         raise NotImplementedError(f"Unknown condition: {cond}")
+                    
+            elif isinstance(v1.type, jvm.Boolean) and isinstance(v2.type, jvm.Boolean):
+                match cond:
+                    case "eq":
+                        jump = (v1.value == v2.value)
+                    case "ne":
+                        jump = (v1.value != v2.value) 
+                    case _:
+                        raise NotImplementedError(f"Boolean only supports eq/ne, got {cond}")       
 
             if jump:
                 frame.pc = PC(frame.pc.method, t)
@@ -561,6 +779,7 @@ def step(state: State) -> State | str:
             return state
 
         case jvm.Ifz(condition=cond, target=t):
+            jump = False
             v1 = frame.stack.pop()
             if v1.type is jvm.Reference():
                 match cond:
@@ -570,10 +789,10 @@ def step(state: State) -> State | str:
                         jump = (v1.value is not None)
                     case _:
                         raise NotImplementedError(f"Unknown condition: {cond}")
-            
-            elif isinstance(v1.type, (jvm.Int, jvm.Boolean, jvm.Float, jvm.Double, jvm.Long)):        
+            #add back in later """jvm.Boolean""", """jvm.Float, jvm.Double, jvm.Long"""
+            elif isinstance(v1.type, jvm.Int):        
                 assert v1.type is jvm.Int(), f"expected int, but got {v1}"
-                assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
+                #assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
 
                 match cond:
                     case "eq": jump = (v1.value == 0)
@@ -584,7 +803,16 @@ def step(state: State) -> State | str:
                     case "ge": jump = (v1.value >= 0)
                     case _:
                         raise NotImplementedError(f"Unknown condition: {cond}")
-
+                    
+            elif isinstance(v1.type, jvm.Boolean):
+                match cond:
+                    case "eq":
+                        jump = (v1.value is False)
+                    case "ne":
+                        jump = (v1.value is True)
+                    case _:
+                        raise NotImplementedError(f"Boolean only supports eq/ne for conditionals, got {cond}")
+        
             if jump:
                 frame.pc = PC(frame.pc.method, t)
             else:
@@ -618,46 +846,46 @@ def step(state: State) -> State | str:
                 return state
             else:
                 return "ok"
+          # unecessary since the above retrieves then returns the type  
+        # case jvm.Return(type=jvm.Boolean()):
+        #     v1 = frame.stack.pop()
+        #     state.frames.pop()
+        #     if state.frames:
+        #         frame = state.frames.peek()
+        #         frame.stack.push(v1)
+        #         return state
+        #     else:
+        #         return "ok" 
             
-        case jvm.Return(type=jvm.Boolean()):
-            v1 = frame.stack.pop()
-            state.frames.pop()
-            if state.frames:
-                frame = state.frames.peek()
-                frame.stack.push(v1)
-                return state
-            else:
-                return "ok" 
+        # case jvm.Return(type=jvm.Float()):
+        #     v1 = frame.stack.pop()
+        #     state.frames.pop()
+        #     if state.frames:
+        #         frame = state.frames.peek()
+        #         frame.stack.push(v1)
+        #         return state
+        #     else:
+        #         return "ok" 
             
-        case jvm.Return(type=jvm.Float()):
-            v1 = frame.stack.pop()
-            state.frames.pop()
-            if state.frames:
-                frame = state.frames.peek()
-                frame.stack.push(v1)
-                return state
-            else:
-                return "ok" 
+        # case jvm.Return(type=jvm.Long()):
+        #     v1 = frame.stack.pop()
+        #     state.frames.pop()
+        #     if state.frames:
+        #         frame = state.frames.peek()
+        #         frame.stack.push(v1)
+        #         return state
+        #     else:
+        #         return "ok" 
             
-        case jvm.Return(type=jvm.Long()):
-            v1 = frame.stack.pop()
-            state.frames.pop()
-            if state.frames:
-                frame = state.frames.peek()
-                frame.stack.push(v1)
-                return state
-            else:
-                return "ok" 
-            
-        case jvm.Return(type=jvm.Double()):
-            v1 = frame.stack.pop()
-            state.frames.pop()
-            if state.frames:
-                frame = state.frames.peek()
-                frame.stack.push(v1)
-                return state
-            else:
-                return "ok" 
+        # case jvm.Return(type=jvm.Double()):
+        #     v1 = frame.stack.pop()
+        #     state.frames.pop()
+        #     if state.frames:
+        #         frame = state.frames.peek()
+        #         frame.stack.push(v1)
+        #         return state
+        #     else:
+        #         return "ok" 
                     
 
                  
@@ -760,10 +988,80 @@ def step(state: State) -> State | str:
                     frame.pc +=1
             return state
 
-    
+        case jvm.Incr(index=i, amount=a):
+    # Load current local
+            v = frame.locals.get(i, None)
+            if v is None:
+                raise RuntimeError(f"Local {i} not initialized before incr")
+
+            if not isinstance(v.type, jvm.Int):
+                raise TypeError(f"iinc expects Int local, got {v.type}")
+
+    # Create new value
+            new_val = jvm.Value(jvm.Int(), v.value + a)
+
+    # Store it back
+            frame.locals[i] = new_val
+
+    # Move PC
+            frame.pc += 1
+            return state
         
+        case jvm.InvokeStatic(method=m):
+    # 1. Get the target method definition
+            target_method = state.interpreter.resolve_method(m)
+
+    # 2. Determine number of parameters
+            param_types = target_method.params
+            num_params = len(param_types)
+
+    # 3. Pop arguments from the caller stack (reverse order)
+            args = []
+            for _ in range(num_params):
+                args.append(frame.stack.pop())
+            args = args[::-1]
+
+    # 4. Create a new frame
+            new_frame = Frame(
+                method=target_method,
+                pc=PC(target_method, 0),
+                stack=Stack.empty(),
+                locals={}
+            )
+
+    # 5. Load arguments into new frame locals
+            for i, arg in enumerate(args):
+                new_frame.locals[i] = arg
+
+    # 6. Push current frame onto call stack
+            state.frames.push(new_frame)
+
+    # 7. Switch to new frame
+            #state.frame = new_frame
+
+            return state
+        
+        case jvm.Return(value_type=t):
+            if t is not None:
+
+                retval = frame.stack.pop()
+            state.frames.pop()
+            
+            if state.frames:
+    # Pop previous frame
+                caller = state.frames.peek()
+                if t is not None:
+
+    # Put return value on caller’s stack
+                    caller.stack.push(retval)
+                caller.pc += 1
+                return state
+            else:
+                return "ok"
+
         case a:
             raise NotImplementedError(f"Don't know how to handle: {a!r}")
+        
 
 
 
@@ -812,12 +1110,52 @@ def step(state: State) -> State | str:
 
 # #END ------------------------------------------------------------------------------------
 
+def run():
+    methodid, input = jpamb.getcase()
 
 
+    frame = Frame.from_method(methodid)
+    for i, v in enumerate(input.values):
+        frame.locals[i] = v
 
+    state = State({}, Stack.empty().push(frame))
+#state = State({}, Stack.empty().push(frame), interpreter)
 
+#from dimitra
+    for i, v in enumerate(input.values):
+    # Convert JVM types to JVM Value objects
+        match v.type:
+            case jvm.Boolean():  # boolean → int
+                v = jvm.Value.int(1 if v.value else 0)
+            case jvm.Int():  # int → JVM Value
+                v = jvm.Value.int(v.value)
+            case jvm.Array():
+                addr = len(state.heap)  # next free heap address
 
+            # Wrap elements properly as JVM values
+                def wrap_element(e):
+                    if isinstance(e, int):
+                        return jvm.Value.int(e)
+                    elif isinstance(e, bool):
+                        return jvm.Value.int(1 if e else 0)
+                    elif isinstance(e, str) and len(e) == 1:
+                        return jvm.Value.char(e)
+                    else:
+                        return e  # fallback
 
+                state.heap[addr] = [wrap_element(e) for e in v.value]  # wrap every element
+                v = jvm.Value(jvm.Reference(), addr)  # wrap as reference
+    for x in range(1000):
+        state = step(state)
+        if isinstance(state, str):
+            print(state)
+            break
+    else:
+        print("*")
+
+if __name__ == "__main__":
+    # methodid, input = jpamb.getcase()
+    run()
 
 
 

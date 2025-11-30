@@ -21,7 +21,7 @@ public class SyntaxerTestBase {
 
   public static void syntaxerHelper() {
     System.out.println("Syntaxer Helper");
-    other.anotherMethod(); 
+    // other.anotherMethod(); 
     syntaxerMain();
   }
 

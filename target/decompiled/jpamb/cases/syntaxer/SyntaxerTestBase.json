@@ -1,0 +1,490 @@
+{
+  "access": [
+    "public",
+    "super"
+  ],
+  "annotations": [],
+  "bootstrapmethods": [],
+  "enclosingmethod": null,
+  "fields": [
+    {
+      "access": [
+        "private",
+        "static"
+      ],
+      "annotations": [],
+      "name": "helperVisited",
+      "type": {
+        "annotations": [],
+        "base": "boolean"
+      },
+      "value": null
+    },
+    {
+      "access": [
+        "private"
+      ],
+      "annotations": [],
+      "name": "other",
+      "type": {
+        "annotations": [],
+        "args": [],
+        "inner": null,
+        "kind": "class",
+        "name": "jpamb/cases/syntaxer/SyntaxerTestOther"
+      },
+      "value": null
+    }
+  ],
+  "innerclasses": [],
+  "interfaces": [],
+  "methods": [
+    {
+      "access": [
+        "public"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "class": "java/lang/Error",
+            "offset": 0,
+            "opr": "new"
+          },
+          {
+            "offset": 3,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Unresolved compilation problem: \n\tThe declared package \"\" does not match the expected package \"jpamb.cases.syntaxer\"\n"
+            }
+          },
+          {
+            "access": "special",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "is_interface": false,
+              "name": "<init>",
+              "ref": {
+                "kind": "class",
+                "name": "java/lang/Error"
+              },
+              "returns": null
+            },
+            "offset": 6,
+            "opr": "invoke"
+          },
+          {
+            "offset": 9,
+            "opr": "throw"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 1,
+            "offset": 0
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 3,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "<init>",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "class": "java/lang/Error",
+            "offset": 0,
+            "opr": "new"
+          },
+          {
+            "offset": 3,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Unresolved compilation problem: \n"
+            }
+          },
+          {
+            "access": "special",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "is_interface": false,
+              "name": "<init>",
+              "ref": {
+                "kind": "class",
+                "name": "java/lang/Error"
+              },
+              "returns": null
+            },
+            "offset": 6,
+            "opr": "invoke"
+          },
+          {
+            "offset": 9,
+            "opr": "throw"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 8,
+            "offset": 0
+          }
+        ],
+        "max_locals": 0,
+        "max_stack": 3,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "main",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "class": "java/lang/Error",
+            "offset": 0,
+            "opr": "new"
+          },
+          {
+            "offset": 3,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Unresolved compilation problem: \n"
+            }
+          },
+          {
+            "access": "special",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "is_interface": false,
+              "name": "<init>",
+              "ref": {
+                "kind": "class",
+                "name": "java/lang/Error"
+              },
+              "returns": null
+            },
+            "offset": 6,
+            "opr": "invoke"
+          },
+          {
+            "offset": 9,
+            "opr": "throw"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 12,
+            "offset": 0
+          }
+        ],
+        "max_locals": 0,
+        "max_stack": 3,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "syntaxerMain",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "class": "java/lang/Error",
+            "offset": 0,
+            "opr": "new"
+          },
+          {
+            "offset": 3,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Unresolved compilation problem: \n"
+            }
+          },
+          {
+            "access": "special",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "is_interface": false,
+              "name": "<init>",
+              "ref": {
+                "kind": "class",
+                "name": "java/lang/Error"
+              },
+              "returns": null
+            },
+            "offset": 6,
+            "opr": "invoke"
+          },
+          {
+            "offset": 9,
+            "opr": "throw"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 22,
+            "offset": 0
+          }
+        ],
+        "max_locals": 0,
+        "max_stack": 3,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "syntaxerHelper",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "class": "java/lang/Error",
+            "offset": 0,
+            "opr": "new"
+          },
+          {
+            "offset": 3,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Unresolved compilation problem: \n"
+            }
+          },
+          {
+            "access": "special",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "is_interface": false,
+              "name": "<init>",
+              "ref": {
+                "kind": "class",
+                "name": "java/lang/Error"
+              },
+              "returns": null
+            },
+            "offset": 6,
+            "opr": "invoke"
+          },
+          {
+            "offset": 9,
+            "opr": "throw"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 28,
+            "offset": 0
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 3,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "neverCalledMethod",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "class": "java/lang/Error",
+            "offset": 0,
+            "opr": "new"
+          },
+          {
+            "offset": 3,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "string",
+              "value": "Unresolved compilation problem: \n"
+            }
+          },
+          {
+            "access": "special",
+            "method": {
+              "args": [
+                {
+                  "kind": "class",
+                  "name": "java/lang/String"
+                }
+              ],
+              "is_interface": false,
+              "name": "<init>",
+              "ref": {
+                "kind": "class",
+                "name": "java/lang/Error"
+              },
+              "returns": null
+            },
+            "offset": 6,
+            "opr": "invoke"
+          },
+          {
+            "offset": 9,
+            "opr": "throw"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 33,
+            "offset": 0
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 3,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "onlyCalledByANeverCalledMethod",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": null
+      },
+      "typeparams": []
+    }
+  ],
+  "name": "jpamb/cases/syntaxer/SyntaxerTestBase",
+  "super": {
+    "annotations": [],
+    "args": [],
+    "inner": null,
+    "name": "java/lang/Object"
+  },
+  "typeparams": [],
+  "version": [
+    63,
+    0
+  ]
+}
