@@ -912,58 +912,6 @@ def plot(ctx, report, directory):
             classes.append(str(methodid.classname))
 
         plot_scores(scores, times, labels, classes)
-
-@cli.command("debloat")
-@click.pass_context
-@click.option(
-    "--root", "-i",
-    "root_dir",
-    type=click.Path(file_okay=False, dir_okay=True, exists=True, path_type=Path),
-    required=True,
-    help="Root folder containing Java sources (project root).",
-)
-@click.option(
-    "--apply/--no-apply",
-    default=False,
-    show_default=True,
-    help="Apply the deletions to files under --root",
-)
-@click.argument("PROGRAM", nargs=-1)
-def debloat(ctx,
-            root_dir: Path,
-            apply):
-    """
-    Run syntactic + static analyzers, save JSONs to debloater/results/json,
-    apply deletions, and emit a final report.
-    """
-    
-    root = root_dir.resolve()
-
-    # 2. Run analysis
-    # Output: 2 json files containing information about what to delete
-    log.info(f"Running CFG builder - looking for unreferenced functions:")
-    # called, not_called = cfg(root)
-
-    called = [
-        "jpamb.cases.Bloated.unreachableBranchBasic:(I)I",
-        "jpamb.cases.Bloated.localInitButNotUsed()I"
-        "jpamb.cases.Bloated.unreachableBranchFor:(I)I",
-        "jpamb.cases.Bloated.unreachableBranchWhile:(I)I",
-        "jpamb.cases.Bloated.unreachableBranchArray:(I)I",
-        "jpamb.cases.Bloated.deadArg:(I)I",
-        "jpamb.cases.Bloated.deadStore:()I",
-        "jpamb.cases.Bloated.keepObservableArrayWrite:(I)V",
-        "jpamb.cases.Bloated.unreachableBranchBasicFloat:(F)F"
-    ]
-    log.info(f"Running static analyzer - looking for dead code inside functions:")
-    json_per_function = static_bytecode_analysis(called)
-    print(json_per_function)
-
-    # 3. If apply, run debloater based on JSONs (CFG - functions, bytecode - lines)
-    
-    # 4. Check if the program runs - dynamic
-    
-    # 5. if yes do some statistics (how much code we got rid, how much of the bloated code actaully got found)
     
 if __name__ == "__main__":
     cli()

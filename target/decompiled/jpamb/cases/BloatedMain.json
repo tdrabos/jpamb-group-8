@@ -6,35 +6,7 @@
   "annotations": [],
   "bootstrapmethods": [],
   "enclosingmethod": null,
-  "fields": [
-    {
-      "access": [
-        "private",
-        "static"
-      ],
-      "annotations": [],
-      "name": "helperVisited",
-      "type": {
-        "annotations": [],
-        "base": "boolean"
-      },
-      "value": null
-    },
-    {
-      "access": [
-        "static",
-        "final",
-        "synthetic"
-      ],
-      "annotations": [],
-      "name": "$assertionsDisabled",
-      "type": {
-        "annotations": [],
-        "base": "boolean"
-      },
-      "value": null
-    }
-  ],
+  "fields": [],
   "innerclasses": [
     {
       "access": [
@@ -88,7 +60,7 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 17,
+            "line": 8,
             "offset": 0
           }
         ],
@@ -117,19 +89,458 @@
         "bytecode": [
           {
             "offset": 0,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [
+                "int"
+              ],
+              "is_interface": false,
+              "name": "unreachableBranchBasic",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": "int"
+            },
+            "offset": 1,
+            "opr": "invoke"
+          },
+          {
+            "index": 0,
+            "offset": 4,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 5,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 42
+            }
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [
+                "int"
+              ],
+              "is_interface": false,
+              "name": "deadArg",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": "int"
+            },
+            "offset": 7,
+            "opr": "invoke"
+          },
+          {
+            "index": 1,
+            "offset": 10,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 11,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [
+                "int"
+              ],
+              "is_interface": false,
+              "name": "unreachableBranchFor",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": "int"
+            },
+            "offset": 12,
+            "opr": "invoke"
+          },
+          {
+            "index": 2,
+            "offset": 15,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 16,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [
+                "int"
+              ],
+              "is_interface": false,
+              "name": "unreachableBranchWhile",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": "int"
+            },
+            "offset": 17,
+            "opr": "invoke"
+          },
+          {
+            "index": 3,
+            "offset": 20,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 21,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [
+                "int"
+              ],
+              "is_interface": false,
+              "name": "unreachableBranchArray",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": "int"
+            },
+            "offset": 22,
+            "opr": "invoke"
+          },
+          {
+            "index": 4,
+            "offset": 25,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 27,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 1
+            }
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [
+                "float"
+              ],
+              "is_interface": false,
+              "name": "unreachableBranchBasicFloat",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": "float"
+            },
+            "offset": 28,
+            "opr": "invoke"
+          },
+          {
+            "index": 5,
+            "offset": 31,
+            "opr": "store",
+            "type": "float"
+          },
+          {
+            "offset": 33,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 10
+            }
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [
+                "int"
+              ],
+              "is_interface": false,
+              "name": "deadLocalInitialization",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": "int"
+            },
+            "offset": 35,
+            "opr": "invoke"
+          },
+          {
+            "index": 6,
+            "offset": 38,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [],
+              "is_interface": false,
+              "name": "unreachableLoopBranchOnIndex",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": null
+            },
+            "offset": 40,
+            "opr": "invoke"
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [],
+              "is_interface": false,
+              "name": "unreachableArrayOutOfBounds",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": null
+            },
+            "offset": 43,
+            "opr": "invoke"
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [],
+              "is_interface": false,
+              "name": "unreachableDivideByZeroBranch",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": "int"
+            },
+            "offset": 46,
+            "opr": "invoke"
+          },
+          {
+            "index": 7,
+            "offset": 49,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "access": "static",
+            "method": {
+              "args": [],
+              "is_interface": false,
+              "name": "localInitButNotUsed",
+              "ref": {
+                "kind": "class",
+                "name": "jpamb/cases/BloatedMain"
+              },
+              "returns": "int"
+            },
+            "offset": 51,
+            "opr": "invoke"
+          },
+          {
+            "index": 8,
+            "offset": 54,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 56,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 57,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 58,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 2,
+            "offset": 59,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 60,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 3,
+            "offset": 61,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 62,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 4,
+            "offset": 63,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 65,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 6,
+            "offset": 66,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 68,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 7,
+            "offset": 69,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 71,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 8,
+            "offset": 72,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 74,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 9,
+            "offset": 75,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "index": 9,
+            "offset": 77,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 79,
             "opr": "return",
-            "type": null
+            "type": "int"
           }
         ],
         "exceptions": [],
         "lines": [
           {
-            "line": 23,
+            "line": 13,
             "offset": 0
+          },
+          {
+            "line": 16,
+            "offset": 3
+          },
+          {
+            "line": 19,
+            "offset": 6
+          },
+          {
+            "line": 22,
+            "offset": 9
+          },
+          {
+            "line": 26,
+            "offset": 12
+          },
+          {
+            "line": 30,
+            "offset": 15
+          },
+          {
+            "line": 33,
+            "offset": 18
+          },
+          {
+            "line": 36,
+            "offset": 21
+          },
+          {
+            "line": 40,
+            "offset": 22
+          },
+          {
+            "line": 44,
+            "offset": 23
+          },
+          {
+            "line": 47,
+            "offset": 25
+          },
+          {
+            "line": 49,
+            "offset": 27
+          },
+          {
+            "line": 50,
+            "offset": 43
           }
         ],
-        "max_locals": 0,
-        "max_stack": 0,
+        "max_locals": 10,
+        "max_stack": 2,
         "stack_map": null
       },
       "default": null,
@@ -138,7 +549,1434 @@
       "params": [],
       "returns": {
         "annotations": [],
-        "type": null
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "ne",
+            "offset": 1,
+            "opr": "ifz",
+            "target": 6
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "index": 0,
+            "offset": 5,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 6,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "offset": 7,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 8,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "le",
+            "offset": 9,
+            "opr": "ifz",
+            "target": 22
+          },
+          {
+            "index": 0,
+            "offset": 12,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 13,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 14,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 15,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 16,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "ne",
+            "offset": 17,
+            "opr": "ifz",
+            "target": 20
+          },
+          {
+            "offset": 20,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "index": 1,
+            "offset": 21,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 22,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 23,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 24,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 25,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 26,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 27,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "offset": 28,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 29,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 54,
+            "offset": 0
+          },
+          {
+            "line": 55,
+            "offset": 2
+          },
+          {
+            "line": 58,
+            "offset": 6
+          },
+          {
+            "line": 59,
+            "offset": 8
+          },
+          {
+            "line": 60,
+            "offset": 12
+          },
+          {
+            "line": 61,
+            "offset": 14
+          },
+          {
+            "line": 62,
+            "offset": 16
+          },
+          {
+            "line": 65,
+            "offset": 20
+          },
+          {
+            "line": 67,
+            "offset": 22
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 2,
+        "stack_map": [
+          {
+            "index": 6,
+            "type": "same"
+          },
+          {
+            "index": 20,
+            "type": "same"
+          },
+          {
+            "index": 22,
+            "type": "same"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unreachableBranchBasic",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "int"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "offset": 0,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "index": 0,
+            "offset": 1,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 2,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 3,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 71,
+            "offset": 0
+          },
+          {
+            "line": 72,
+            "offset": 2
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 1,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "localInitButNotUsed",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "ne",
+            "offset": 1,
+            "opr": "ifz",
+            "target": 6
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "index": 0,
+            "offset": 5,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 6,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "offset": 7,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "offset": 8,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "index": 1,
+            "offset": 9,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 10,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 11,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "condition": "ge",
+            "offset": 12,
+            "opr": "if",
+            "target": 19
+          },
+          {
+            "amount": 1,
+            "index": 0,
+            "offset": 15,
+            "opr": "incr"
+          },
+          {
+            "index": 1,
+            "offset": 18,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 19,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "condition": "ne",
+            "offset": 20,
+            "opr": "if",
+            "target": 17
+          },
+          {
+            "offset": 23,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 24,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "amount": 1,
+            "index": 1,
+            "offset": 25,
+            "opr": "incr"
+          },
+          {
+            "offset": 28,
+            "opr": "goto",
+            "target": 8
+          },
+          {
+            "offset": 31,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 32,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 76,
+            "offset": 0
+          },
+          {
+            "line": 77,
+            "offset": 2
+          },
+          {
+            "line": 80,
+            "offset": 6
+          },
+          {
+            "line": 81,
+            "offset": 11
+          },
+          {
+            "line": 82,
+            "offset": 12
+          },
+          {
+            "line": 80,
+            "offset": 17
+          },
+          {
+            "line": 84,
+            "offset": 19
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 2,
+        "stack_map": [
+          {
+            "index": 6,
+            "type": "same"
+          },
+          {
+            "index": 8,
+            "info": [
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "append_frame"
+          },
+          {
+            "index": 17,
+            "type": "same"
+          },
+          {
+            "index": 19,
+            "info": 1,
+            "type": "chop_frame"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unreachableBranchFor",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "int"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "ne",
+            "offset": 1,
+            "opr": "ifz",
+            "target": 6
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "index": 0,
+            "offset": 5,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 6,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "offset": 7,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "offset": 8,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "index": 1,
+            "offset": 9,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 10,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 11,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "condition": "ge",
+            "offset": 12,
+            "opr": "if",
+            "target": 23
+          },
+          {
+            "amount": 1,
+            "index": 0,
+            "offset": 15,
+            "opr": "incr"
+          },
+          {
+            "index": 1,
+            "offset": 18,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 19,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "condition": "ne",
+            "offset": 20,
+            "opr": "if",
+            "target": 21
+          },
+          {
+            "index": 0,
+            "offset": 23,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 24,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 25,
+            "operant": "sub",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 26,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 27,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 28,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "amount": 1,
+            "index": 1,
+            "offset": 29,
+            "opr": "incr"
+          },
+          {
+            "offset": 32,
+            "opr": "goto",
+            "target": 8
+          },
+          {
+            "offset": 35,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 36,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 88,
+            "offset": 0
+          },
+          {
+            "line": 89,
+            "offset": 2
+          },
+          {
+            "line": 91,
+            "offset": 6
+          },
+          {
+            "line": 92,
+            "offset": 8
+          },
+          {
+            "line": 93,
+            "offset": 11
+          },
+          {
+            "line": 94,
+            "offset": 12
+          },
+          {
+            "line": 95,
+            "offset": 15
+          },
+          {
+            "line": 96,
+            "offset": 19
+          },
+          {
+            "line": 98,
+            "offset": 21
+          },
+          {
+            "line": 100,
+            "offset": 23
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 2,
+        "stack_map": [
+          {
+            "index": 6,
+            "type": "same"
+          },
+          {
+            "index": 8,
+            "info": [
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "append_frame"
+          },
+          {
+            "index": 21,
+            "type": "same"
+          },
+          {
+            "index": 23,
+            "type": "same"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unreachableBranchWhile",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "int"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "le",
+            "offset": 1,
+            "opr": "ifz",
+            "target": 36
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 5
+            }
+          },
+          {
+            "dim": 1,
+            "offset": 5,
+            "opr": "newarray",
+            "type": "int"
+          },
+          {
+            "offset": 7,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 8,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 9,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "offset": 10,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 11,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 12,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "offset": 13,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 14,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 15,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 16,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 17,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 3
+            }
+          },
+          {
+            "offset": 18,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 19,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 20,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 3
+            }
+          },
+          {
+            "offset": 21,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "offset": 22,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 23,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 24,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 4
+            }
+          },
+          {
+            "offset": 25,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 5
+            }
+          },
+          {
+            "offset": 26,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 27,
+            "opr": "store",
+            "type": "ref"
+          },
+          {
+            "index": 1,
+            "offset": 28,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "offset": 29,
+            "opr": "arraylength"
+          },
+          {
+            "offset": 30,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 5
+            }
+          },
+          {
+            "condition": "le",
+            "offset": 31,
+            "opr": "if",
+            "target": 32
+          },
+          {
+            "amount": 1,
+            "index": 0,
+            "offset": 34,
+            "opr": "incr"
+          },
+          {
+            "index": 0,
+            "offset": 37,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 38,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 39,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "offset": 40,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 41,
+            "opr": "array_load",
+            "type": "int"
+          },
+          {
+            "offset": 42,
+            "opr": "return",
+            "type": "int"
+          },
+          {
+            "offset": 43,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 44,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 104,
+            "offset": 0
+          },
+          {
+            "line": 105,
+            "offset": 2
+          },
+          {
+            "line": 106,
+            "offset": 25
+          },
+          {
+            "line": 107,
+            "offset": 29
+          },
+          {
+            "line": 108,
+            "offset": 30
+          },
+          {
+            "line": 110,
+            "offset": 32
+          },
+          {
+            "line": 112,
+            "offset": 36
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 4,
+        "stack_map": [
+          {
+            "index": 32,
+            "info": [
+              {
+                "ref": {
+                  "kind": "array",
+                  "type": "int"
+                },
+                "type": "object"
+              }
+            ],
+            "type": "append_frame"
+          },
+          {
+            "index": 36,
+            "info": 1,
+            "type": "chop_frame"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unreachableBranchArray",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "int"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "offset": 0,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 1,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 116,
+            "offset": 0
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 1,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "deadArg",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "int"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "index": 0,
+            "offset": 0,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 1,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 0
+            }
+          },
+          {
+            "offset": 2,
+            "onnan": 1,
+            "opr": "comparefloating",
+            "type": "float"
+          },
+          {
+            "condition": "ne",
+            "offset": 3,
+            "opr": "ifz",
+            "target": 8
+          },
+          {
+            "offset": 6,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 1.5
+            }
+          },
+          {
+            "index": 0,
+            "offset": 8,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 9,
+            "operant": "add",
+            "opr": "binary",
+            "type": "float"
+          },
+          {
+            "offset": 10,
+            "opr": "return",
+            "type": "float"
+          },
+          {
+            "index": 0,
+            "offset": 11,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 12,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 0
+            }
+          },
+          {
+            "offset": 13,
+            "onnan": 1,
+            "opr": "comparefloating",
+            "type": "float"
+          },
+          {
+            "condition": "le",
+            "offset": 14,
+            "opr": "ifz",
+            "target": 25
+          },
+          {
+            "index": 0,
+            "offset": 17,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 18,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 2
+            }
+          },
+          {
+            "offset": 19,
+            "operant": "add",
+            "opr": "binary",
+            "type": "float"
+          },
+          {
+            "index": 0,
+            "offset": 20,
+            "opr": "store",
+            "type": "float"
+          },
+          {
+            "index": 0,
+            "offset": 21,
+            "opr": "load",
+            "type": "float"
+          },
+          {
+            "offset": 22,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 0
+            }
+          },
+          {
+            "offset": 23,
+            "onnan": 1,
+            "opr": "comparefloating",
+            "type": "float"
+          },
+          {
+            "condition": "ne",
+            "offset": 24,
+            "opr": "ifz",
+            "target": 23
+          },
+          {
+            "offset": 27,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "index": 1,
+            "offset": 28,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "amount": 1,
+            "index": 1,
+            "offset": 29,
+            "opr": "incr"
+          },
+          {
+            "offset": 32,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 1
+            }
+          },
+          {
+            "offset": 33,
+            "opr": "return",
+            "type": "float"
+          },
+          {
+            "offset": 34,
+            "opr": "push",
+            "value": {
+              "type": "float",
+              "value": 0
+            }
+          },
+          {
+            "offset": 35,
+            "opr": "return",
+            "type": "float"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 120,
+            "offset": 0
+          },
+          {
+            "line": 121,
+            "offset": 4
+          },
+          {
+            "line": 123,
+            "offset": 8
+          },
+          {
+            "line": 124,
+            "offset": 12
+          },
+          {
+            "line": 126,
+            "offset": 16
+          },
+          {
+            "line": 127,
+            "offset": 20
+          },
+          {
+            "line": 128,
+            "offset": 22
+          },
+          {
+            "line": 130,
+            "offset": 23
+          },
+          {
+            "line": 132,
+            "offset": 25
+          }
+        ],
+        "max_locals": 2,
+        "max_stack": 2,
+        "stack_map": [
+          {
+            "index": 8,
+            "type": "same"
+          },
+          {
+            "index": 23,
+            "type": "same"
+          },
+          {
+            "index": 25,
+            "type": "same"
+          }
+        ]
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unreachableBranchBasicFloat",
+      "params": [
+        {
+          "annotations": [],
+          "type": {
+            "annotations": [],
+            "base": "float"
+          },
+          "visible": true
+        }
+      ],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "float"
+        }
       },
       "typeparams": []
     },
@@ -178,19 +2016,7 @@
             "type": "int"
           },
           {
-            "index": 0,
             "offset": 5,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "condition": "le",
-            "offset": 6,
-            "opr": "ifz",
-            "target": 10
-          },
-          {
-            "offset": 9,
             "opr": "push",
             "value": {
               "type": "integer",
@@ -199,9 +2025,21 @@
           },
           {
             "index": 3,
-            "offset": 11,
+            "offset": 7,
             "opr": "store",
             "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 8,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "le",
+            "offset": 9,
+            "opr": "ifz",
+            "target": 10
           },
           {
             "offset": 12,
@@ -224,7 +2062,19 @@
             "type": "int"
           },
           {
+            "index": 3,
             "offset": 16,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 17,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "offset": 18,
             "opr": "return",
             "type": "int"
           }
@@ -232,36 +2082,39 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 28,
+            "line": 136,
             "offset": 0
           },
           {
-            "line": 29,
+            "line": 137,
             "offset": 2
           },
           {
-            "line": 30,
+            "line": 138,
             "offset": 4
           },
           {
-            "line": 31,
+            "line": 139,
             "offset": 6
           },
           {
-            "line": 32,
+            "line": 140,
             "offset": 8
           },
           {
-            "line": 34,
+            "line": 142,
             "offset": 10
           }
         ],
         "max_locals": 4,
-        "max_stack": 1,
+        "max_stack": 2,
         "stack_map": [
           {
             "index": 10,
             "info": [
+              {
+                "type": "integer"
+              },
               {
                 "type": "integer"
               },
@@ -299,1683 +2152,7 @@
         "public",
         "static"
       ],
-      "annotations": [
-        {
-          "is_runtime_visible": true,
-          "type": "jpamb/utils/Tag",
-          "values": {
-            "value": {
-              "type": "array",
-              "value": [
-                {
-                  "type": "enum",
-                  "value": {
-                    "name": "ARRAY",
-                    "type": {
-                      "kind": "class",
-                      "name": "jpamb/utils/Tag$TagType"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ],
-      "code": {
-        "annotations": [],
-        "bytecode": [
-          {
-            "offset": 0,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 3
-            }
-          },
-          {
-            "dim": 1,
-            "offset": 1,
-            "opr": "newarray",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 3,
-            "opr": "store",
-            "type": "ref"
-          },
-          {
-            "index": 0,
-            "offset": 4,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 5,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 6,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 5
-            }
-          },
-          {
-            "offset": 7,
-            "opr": "array_store",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 8,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 9,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 10,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 7
-            }
-          },
-          {
-            "offset": 12,
-            "opr": "array_store",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 13,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 14,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "offset": 15,
-            "opr": "array_load",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 16,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 17,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 18,
-            "opr": "array_load",
-            "type": "int"
-          },
-          {
-            "offset": 19,
-            "operant": "add",
-            "opr": "binary",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 20,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 21,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 2
-            }
-          },
-          {
-            "offset": 22,
-            "opr": "array_load",
-            "type": "int"
-          },
-          {
-            "offset": 23,
-            "operant": "add",
-            "opr": "binary",
-            "type": "int"
-          },
-          {
-            "index": 1,
-            "offset": 24,
-            "opr": "store",
-            "type": "int"
-          },
-          {
-            "field": {
-              "class": "jpamb/cases/BloatedMain",
-              "name": "$assertionsDisabled",
-              "type": "boolean"
-            },
-            "offset": 25,
-            "opr": "get",
-            "static": true
-          },
-          {
-            "condition": "ne",
-            "offset": 28,
-            "opr": "ifz",
-            "target": 32
-          },
-          {
-            "index": 1,
-            "offset": 31,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 32,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 7
-            }
-          },
-          {
-            "condition": "eq",
-            "offset": 34,
-            "opr": "if",
-            "target": 32
-          },
-          {
-            "class": "java/lang/AssertionError",
-            "offset": 37,
-            "opr": "new"
-          },
-          {
-            "offset": 40,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "access": "special",
-            "method": {
-              "args": [],
-              "is_interface": false,
-              "name": "<init>",
-              "ref": {
-                "kind": "class",
-                "name": "java/lang/AssertionError"
-              },
-              "returns": null
-            },
-            "offset": 41,
-            "opr": "invoke"
-          },
-          {
-            "offset": 44,
-            "opr": "throw"
-          },
-          {
-            "index": 1,
-            "offset": 45,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 46,
-            "opr": "return",
-            "type": "int"
-          }
-        ],
-        "exceptions": [],
-        "lines": [
-          {
-            "line": 40,
-            "offset": 0
-          },
-          {
-            "line": 41,
-            "offset": 3
-          },
-          {
-            "line": 42,
-            "offset": 7
-          },
-          {
-            "line": 43,
-            "offset": 11
-          },
-          {
-            "line": 44,
-            "offset": 23
-          },
-          {
-            "line": 45,
-            "offset": 32
-          }
-        ],
-        "max_locals": 2,
-        "max_stack": 3,
-        "stack_map": [
-          {
-            "index": 32,
-            "info": [
-              {
-                "ref": {
-                  "kind": "array",
-                  "type": "int"
-                },
-                "type": "object"
-              },
-              {
-                "type": "integer"
-              }
-            ],
-            "type": "append_frame"
-          }
-        ]
-      },
-      "default": null,
-      "exceptions": [],
-      "name": "deadArrayStore",
-      "params": [],
-      "returns": {
-        "annotations": [],
-        "type": {
-          "base": "int"
-        }
-      },
-      "typeparams": []
-    },
-    {
-      "access": [
-        "public",
-        "static"
-      ],
-      "annotations": [
-        {
-          "is_runtime_visible": true,
-          "type": "jpamb/utils/Tag",
-          "values": {
-            "value": {
-              "type": "array",
-              "value": [
-                {
-                  "type": "enum",
-                  "value": {
-                    "name": "LOOP",
-                    "type": {
-                      "kind": "class",
-                      "name": "jpamb/utils/Tag$TagType"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ],
-      "code": {
-        "annotations": [],
-        "bytecode": [
-          {
-            "offset": 0,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "index": 1,
-            "offset": 1,
-            "opr": "store",
-            "type": "int"
-          },
-          {
-            "offset": 2,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "index": 2,
-            "offset": 3,
-            "opr": "store",
-            "type": "int"
-          },
-          {
-            "index": 2,
-            "offset": 4,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 5,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "condition": "ge",
-            "offset": 6,
-            "opr": "if",
-            "target": 22
-          },
-          {
-            "offset": 9,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 10
-            }
-          },
-          {
-            "index": 3,
-            "offset": 11,
-            "opr": "store",
-            "type": "int"
-          },
-          {
-            "index": 1,
-            "offset": 12,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "index": 2,
-            "offset": 13,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 14,
-            "operant": "add",
-            "opr": "binary",
-            "type": "int"
-          },
-          {
-            "index": 1,
-            "offset": 15,
-            "opr": "store",
-            "type": "int"
-          },
-          {
-            "index": 3,
-            "offset": 16,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 17,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 11
-            }
-          },
-          {
-            "condition": "ne",
-            "offset": 19,
-            "opr": "if",
-            "target": 20
-          },
-          {
-            "index": 1,
-            "offset": 22,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "index": 3,
-            "offset": 23,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 24,
-            "operant": "add",
-            "opr": "binary",
-            "type": "int"
-          },
-          {
-            "index": 1,
-            "offset": 25,
-            "opr": "store",
-            "type": "int"
-          },
-          {
-            "amount": 1,
-            "index": 2,
-            "offset": 26,
-            "opr": "incr"
-          },
-          {
-            "offset": 29,
-            "opr": "goto",
-            "target": 4
-          },
-          {
-            "field": {
-              "class": "jpamb/cases/BloatedMain",
-              "name": "$assertionsDisabled",
-              "type": "boolean"
-            },
-            "offset": 32,
-            "opr": "get",
-            "static": true
-          },
-          {
-            "condition": "ne",
-            "offset": 35,
-            "opr": "ifz",
-            "target": 37
-          },
-          {
-            "index": 1,
-            "offset": 38,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 39,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 40,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 41,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 42,
-            "operant": "sub",
-            "opr": "binary",
-            "type": "int"
-          },
-          {
-            "offset": 43,
-            "operant": "mul",
-            "opr": "binary",
-            "type": "int"
-          },
-          {
-            "offset": 44,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 2
-            }
-          },
-          {
-            "offset": 45,
-            "operant": "div",
-            "opr": "binary",
-            "type": "int"
-          },
-          {
-            "condition": "eq",
-            "offset": 46,
-            "opr": "if",
-            "target": 37
-          },
-          {
-            "class": "java/lang/AssertionError",
-            "offset": 49,
-            "opr": "new"
-          },
-          {
-            "offset": 52,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "access": "special",
-            "method": {
-              "args": [],
-              "is_interface": false,
-              "name": "<init>",
-              "ref": {
-                "kind": "class",
-                "name": "java/lang/AssertionError"
-              },
-              "returns": null
-            },
-            "offset": 53,
-            "opr": "invoke"
-          },
-          {
-            "offset": 56,
-            "opr": "throw"
-          },
-          {
-            "index": 1,
-            "offset": 57,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 58,
-            "opr": "return",
-            "type": "int"
-          }
-        ],
-        "exceptions": [],
-        "lines": [
-          {
-            "line": 52,
-            "offset": 0
-          },
-          {
-            "line": 53,
-            "offset": 2
-          },
-          {
-            "line": 54,
-            "offset": 7
-          },
-          {
-            "line": 55,
-            "offset": 9
-          },
-          {
-            "line": 56,
-            "offset": 13
-          },
-          {
-            "line": 57,
-            "offset": 16
-          },
-          {
-            "line": 53,
-            "offset": 20
-          },
-          {
-            "line": 60,
-            "offset": 22
-          },
-          {
-            "line": 61,
-            "offset": 37
-          }
-        ],
-        "max_locals": 4,
-        "max_stack": 4,
-        "stack_map": [
-          {
-            "index": 4,
-            "info": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "integer"
-              }
-            ],
-            "type": "append_frame"
-          },
-          {
-            "index": 20,
-            "type": "same"
-          },
-          {
-            "index": 22,
-            "info": 1,
-            "type": "chop_frame"
-          },
-          {
-            "index": 37,
-            "type": "same"
-          }
-        ]
-      },
-      "default": null,
-      "exceptions": [],
-      "name": "loopInvariantComputation",
-      "params": [
-        {
-          "annotations": [],
-          "type": {
-            "annotations": [],
-            "base": "int"
-          },
-          "visible": true
-        }
-      ],
-      "returns": {
-        "annotations": [],
-        "type": {
-          "base": "int"
-        }
-      },
-      "typeparams": []
-    },
-    {
-      "access": [
-        "public",
-        "static"
-      ],
-      "annotations": [
-        {
-          "is_runtime_visible": true,
-          "type": "jpamb/utils/Tag",
-          "values": {
-            "value": {
-              "type": "array",
-              "value": [
-                {
-                  "type": "enum",
-                  "value": {
-                    "name": "ARRAY",
-                    "type": {
-                      "kind": "class",
-                      "name": "jpamb/utils/Tag$TagType"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ],
-      "code": {
-        "annotations": [],
-        "bytecode": [
-          {
-            "offset": 0,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 3
-            }
-          },
-          {
-            "dim": 1,
-            "offset": 1,
-            "opr": "newarray",
-            "type": "int"
-          },
-          {
-            "offset": 3,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "offset": 4,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "offset": 5,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 6,
-            "opr": "array_store",
-            "type": "int"
-          },
-          {
-            "offset": 7,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "offset": 8,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 9,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 2
-            }
-          },
-          {
-            "offset": 10,
-            "opr": "array_store",
-            "type": "int"
-          },
-          {
-            "offset": 11,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "offset": 12,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 2
-            }
-          },
-          {
-            "offset": 13,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 3
-            }
-          },
-          {
-            "offset": 14,
-            "opr": "array_store",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 15,
-            "opr": "store",
-            "type": "ref"
-          },
-          {
-            "index": 0,
-            "offset": 16,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 17,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 18,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 5
-            }
-          },
-          {
-            "offset": 19,
-            "opr": "array_store",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 20,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 21,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 22,
-            "opr": "array_load",
-            "type": "int"
-          },
-          {
-            "index": 1,
-            "offset": 23,
-            "opr": "store",
-            "type": "int"
-          },
-          {
-            "field": {
-              "class": "jpamb/cases/BloatedMain",
-              "name": "$assertionsDisabled",
-              "type": "boolean"
-            },
-            "offset": 24,
-            "opr": "get",
-            "static": true
-          },
-          {
-            "condition": "ne",
-            "offset": 27,
-            "opr": "ifz",
-            "target": 32
-          },
-          {
-            "index": 1,
-            "offset": 30,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 31,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 5
-            }
-          },
-          {
-            "condition": "eq",
-            "offset": 32,
-            "opr": "if",
-            "target": 32
-          },
-          {
-            "class": "java/lang/AssertionError",
-            "offset": 35,
-            "opr": "new"
-          },
-          {
-            "offset": 38,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "access": "special",
-            "method": {
-              "args": [],
-              "is_interface": false,
-              "name": "<init>",
-              "ref": {
-                "kind": "class",
-                "name": "java/lang/AssertionError"
-              },
-              "returns": null
-            },
-            "offset": 39,
-            "opr": "invoke"
-          },
-          {
-            "offset": 42,
-            "opr": "throw"
-          },
-          {
-            "index": 1,
-            "offset": 43,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 44,
-            "opr": "return",
-            "type": "int"
-          }
-        ],
-        "exceptions": [],
-        "lines": [
-          {
-            "line": 69,
-            "offset": 0
-          },
-          {
-            "line": 70,
-            "offset": 15
-          },
-          {
-            "line": 71,
-            "offset": 19
-          },
-          {
-            "line": 72,
-            "offset": 23
-          },
-          {
-            "line": 73,
-            "offset": 32
-          }
-        ],
-        "max_locals": 2,
-        "max_stack": 4,
-        "stack_map": [
-          {
-            "index": 32,
-            "info": [
-              {
-                "ref": {
-                  "kind": "array",
-                  "type": "int"
-                },
-                "type": "object"
-              },
-              {
-                "type": "integer"
-              }
-            ],
-            "type": "append_frame"
-          }
-        ]
-      },
-      "default": null,
-      "exceptions": [],
-      "name": "keepObservableArrayWrite",
-      "params": [],
-      "returns": {
-        "annotations": [],
-        "type": {
-          "base": "int"
-        }
-      },
-      "typeparams": []
-    },
-    {
-      "access": [
-        "public",
-        "static"
-      ],
       "annotations": [],
-      "code": {
-        "annotations": [],
-        "bytecode": [
-          {
-            "index": 0,
-            "offset": 0,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 1,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "offset": 2,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 42
-            }
-          },
-          {
-            "offset": 4,
-            "opr": "array_store",
-            "type": "int"
-          },
-          {
-            "offset": 5,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 6,
-            "opr": "return",
-            "type": "int"
-          }
-        ],
-        "exceptions": [],
-        "lines": [
-          {
-            "line": 78,
-            "offset": 0
-          },
-          {
-            "line": 79,
-            "offset": 4
-          }
-        ],
-        "max_locals": 1,
-        "max_stack": 3,
-        "stack_map": null
-      },
-      "default": null,
-      "exceptions": [],
-      "name": "setFlag",
-      "params": [
-        {
-          "annotations": [],
-          "type": {
-            "annotations": [],
-            "kind": "array",
-            "type": {
-              "annotations": [],
-              "base": "int"
-            }
-          },
-          "visible": true
-        }
-      ],
-      "returns": {
-        "annotations": [],
-        "type": {
-          "base": "boolean"
-        }
-      },
-      "typeparams": []
-    },
-    {
-      "access": [
-        "public",
-        "static"
-      ],
-      "annotations": [
-        {
-          "is_runtime_visible": true,
-          "type": "jpamb/utils/Tag",
-          "values": {
-            "value": {
-              "type": "array",
-              "value": [
-                {
-                  "type": "enum",
-                  "value": {
-                    "name": "CALL",
-                    "type": {
-                      "kind": "class",
-                      "name": "jpamb/utils/Tag$TagType"
-                    }
-                  }
-                },
-                {
-                  "type": "enum",
-                  "value": {
-                    "name": "ARRAY",
-                    "type": {
-                      "kind": "class",
-                      "name": "jpamb/utils/Tag$TagType"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ],
-      "code": {
-        "annotations": [],
-        "bytecode": [
-          {
-            "offset": 0,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "dim": 1,
-            "offset": 1,
-            "opr": "newarray",
-            "type": "int"
-          },
-          {
-            "offset": 3,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "offset": 4,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "offset": 5,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "offset": 6,
-            "opr": "array_store",
-            "type": "int"
-          },
-          {
-            "index": 1,
-            "offset": 7,
-            "opr": "store",
-            "type": "ref"
-          },
-          {
-            "index": 0,
-            "offset": 8,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "condition": "le",
-            "offset": 9,
-            "opr": "ifz",
-            "target": 12
-          },
-          {
-            "index": 1,
-            "offset": 12,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "access": "static",
-            "method": {
-              "args": [
-                {
-                  "kind": "array",
-                  "type": "int"
-                }
-              ],
-              "is_interface": false,
-              "name": "setFlag",
-              "ref": {
-                "kind": "class",
-                "name": "jpamb/cases/BloatedMain"
-              },
-              "returns": "boolean"
-            },
-            "offset": 13,
-            "opr": "invoke"
-          },
-          {
-            "condition": "eq",
-            "offset": 16,
-            "opr": "ifz",
-            "target": 12
-          },
-          {
-            "index": 0,
-            "offset": 19,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "condition": "gt",
-            "offset": 20,
-            "opr": "ifz",
-            "target": 24
-          },
-          {
-            "field": {
-              "class": "jpamb/cases/BloatedMain",
-              "name": "$assertionsDisabled",
-              "type": "boolean"
-            },
-            "offset": 23,
-            "opr": "get",
-            "static": true
-          },
-          {
-            "condition": "ne",
-            "offset": 26,
-            "opr": "ifz",
-            "target": 35
-          },
-          {
-            "index": 1,
-            "offset": 29,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 30,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "offset": 31,
-            "opr": "array_load",
-            "type": "int"
-          },
-          {
-            "condition": "eq",
-            "offset": 32,
-            "opr": "ifz",
-            "target": 35
-          },
-          {
-            "class": "java/lang/AssertionError",
-            "offset": 35,
-            "opr": "new"
-          },
-          {
-            "offset": 38,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "access": "special",
-            "method": {
-              "args": [],
-              "is_interface": false,
-              "name": "<init>",
-              "ref": {
-                "kind": "class",
-                "name": "java/lang/AssertionError"
-              },
-              "returns": null
-            },
-            "offset": 39,
-            "opr": "invoke"
-          },
-          {
-            "offset": 42,
-            "opr": "throw"
-          },
-          {
-            "field": {
-              "class": "jpamb/cases/BloatedMain",
-              "name": "$assertionsDisabled",
-              "type": "boolean"
-            },
-            "offset": 43,
-            "opr": "get",
-            "static": true
-          },
-          {
-            "condition": "ne",
-            "offset": 46,
-            "opr": "ifz",
-            "target": 35
-          },
-          {
-            "index": 1,
-            "offset": 49,
-            "opr": "load",
-            "type": "ref"
-          },
-          {
-            "offset": 50,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "offset": 51,
-            "opr": "array_load",
-            "type": "int"
-          },
-          {
-            "offset": 52,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 42
-            }
-          },
-          {
-            "condition": "eq",
-            "offset": 54,
-            "opr": "if",
-            "target": 35
-          },
-          {
-            "class": "java/lang/AssertionError",
-            "offset": 57,
-            "opr": "new"
-          },
-          {
-            "offset": 60,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "access": "special",
-            "method": {
-              "args": [],
-              "is_interface": false,
-              "name": "<init>",
-              "ref": {
-                "kind": "class",
-                "name": "java/lang/AssertionError"
-              },
-              "returns": null
-            },
-            "offset": 61,
-            "opr": "invoke"
-          },
-          {
-            "offset": 64,
-            "opr": "throw"
-          },
-          {
-            "offset": 65,
-            "opr": "return",
-            "type": null
-          }
-        ],
-        "exceptions": [],
-        "lines": [
-          {
-            "line": 87,
-            "offset": 0
-          },
-          {
-            "line": 88,
-            "offset": 7
-          },
-          {
-            "line": 91,
-            "offset": 12
-          },
-          {
-            "line": 93,
-            "offset": 14
-          },
-          {
-            "line": 96,
-            "offset": 24
-          },
-          {
-            "line": 98,
-            "offset": 35
-          }
-        ],
-        "max_locals": 2,
-        "max_stack": 4,
-        "stack_map": [
-          {
-            "index": 12,
-            "info": [
-              {
-                "ref": {
-                  "kind": "array",
-                  "type": "int"
-                },
-                "type": "object"
-              }
-            ],
-            "type": "append_frame"
-          },
-          {
-            "index": 24,
-            "type": "same"
-          },
-          {
-            "index": 35,
-            "type": "same"
-          }
-        ]
-      },
-      "default": null,
-      "exceptions": [],
-      "name": "shortCircuitBooleanSideEffect",
-      "params": [
-        {
-          "annotations": [],
-          "type": {
-            "annotations": [],
-            "base": "int"
-          },
-          "visible": true
-        }
-      ],
-      "returns": {
-        "annotations": [],
-        "type": null
-      },
-      "typeparams": []
-    },
-    {
-      "access": [
-        "public",
-        "static"
-      ],
-      "annotations": [],
-      "code": {
-        "annotations": [],
-        "bytecode": [
-          {
-            "index": 0,
-            "offset": 0,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "condition": "ne",
-            "offset": 1,
-            "opr": "ifz",
-            "target": 4
-          },
-          {
-            "offset": 4,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "offset": 5,
-            "opr": "return",
-            "type": "int"
-          },
-          {
-            "index": 0,
-            "offset": 6,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "index": 1,
-            "offset": 7,
-            "opr": "store",
-            "type": "int"
-          },
-          {
-            "index": 1,
-            "offset": 8,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "condition": "le",
-            "offset": 9,
-            "opr": "ifz",
-            "target": 10
-          },
-          {
-            "index": 1,
-            "offset": 12,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 13,
-            "opr": "return",
-            "type": "int"
-          },
-          {
-            "offset": 14,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 10
-            }
-          },
-          {
-            "offset": 16,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "offset": 17,
-            "operant": "div",
-            "opr": "binary",
-            "type": "int"
-          },
-          {
-            "index": 2,
-            "offset": 18,
-            "opr": "store",
-            "type": "int"
-          },
-          {
-            "index": 2,
-            "offset": 19,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "offset": 20,
-            "opr": "return",
-            "type": "int"
-          }
-        ],
-        "exceptions": [],
-        "lines": [
-          {
-            "line": 103,
-            "offset": 0
-          },
-          {
-            "line": 104,
-            "offset": 2
-          },
-          {
-            "line": 106,
-            "offset": 4
-          },
-          {
-            "line": 107,
-            "offset": 6
-          },
-          {
-            "line": 108,
-            "offset": 8
-          },
-          {
-            "line": 111,
-            "offset": 10
-          },
-          {
-            "line": 112,
-            "offset": 14
-          }
-        ],
-        "max_locals": 3,
-        "max_stack": 2,
-        "stack_map": [
-          {
-            "index": 4,
-            "type": "same"
-          },
-          {
-            "index": 10,
-            "info": [
-              {
-                "type": "integer"
-              }
-            ],
-            "type": "append_frame"
-          }
-        ]
-      },
-      "default": null,
-      "exceptions": [],
-      "name": "earlyReturnDeadTail",
-      "params": [
-        {
-          "annotations": [],
-          "type": {
-            "annotations": [],
-            "base": "int"
-          },
-          "visible": true
-        }
-      ],
-      "returns": {
-        "annotations": [],
-        "type": {
-          "base": "int"
-        }
-      },
-      "typeparams": []
-    },
-    {
-      "access": [
-        "public",
-        "static"
-      ],
-      "annotations": [
-        {
-          "is_runtime_visible": true,
-          "type": "jpamb/utils/Tag",
-          "values": {
-            "value": {
-              "type": "array",
-              "value": [
-                {
-                  "type": "enum",
-                  "value": {
-                    "name": "ARRAY",
-                    "type": {
-                      "kind": "class",
-                      "name": "jpamb/utils/Tag$TagType"
-                    }
-                  }
-                },
-                {
-                  "type": "enum",
-                  "value": {
-                    "name": "LOOP",
-                    "type": {
-                      "kind": "class",
-                      "name": "jpamb/utils/Tag$TagType"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ],
       "code": {
         "annotations": [],
         "bytecode": [
@@ -2223,35 +2400,27 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 118,
+            "line": 147,
             "offset": 0
           },
           {
-            "line": 120,
+            "line": 149,
             "offset": 15
           },
           {
-            "line": 121,
+            "line": 150,
             "offset": 21
           },
           {
-            "line": 122,
-            "offset": 24
-          },
-          {
-            "line": 124,
+            "line": 151,
             "offset": 28
           },
           {
-            "line": 125,
-            "offset": 31
-          },
-          {
-            "line": 120,
+            "line": 149,
             "offset": 35
           },
           {
-            "line": 128,
+            "line": 153,
             "offset": 37
           }
         ],
@@ -2304,39 +2473,7 @@
         "public",
         "static"
       ],
-      "annotations": [
-        {
-          "is_runtime_visible": true,
-          "type": "jpamb/utils/Tag",
-          "values": {
-            "value": {
-              "type": "array",
-              "value": [
-                {
-                  "type": "enum",
-                  "value": {
-                    "name": "ARRAY",
-                    "type": {
-                      "kind": "class",
-                      "name": "jpamb/utils/Tag$TagType"
-                    }
-                  }
-                },
-                {
-                  "type": "enum",
-                  "value": {
-                    "name": "LOOP",
-                    "type": {
-                      "kind": "class",
-                      "name": "jpamb/utils/Tag$TagType"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ],
+      "annotations": [],
       "code": {
         "annotations": [],
         "bytecode": [
@@ -2472,7 +2609,7 @@
             "condition": "ge",
             "offset": 21,
             "opr": "if",
-            "target": 38
+            "target": 30
           },
           {
             "index": 1,
@@ -2492,7 +2629,7 @@
             "condition": "ne",
             "offset": 26,
             "opr": "if",
-            "target": 36
+            "target": 28
           },
           {
             "index": 0,
@@ -2520,75 +2657,18 @@
             "type": "int"
           },
           {
-            "field": {
-              "class": "jpamb/cases/BloatedMain",
-              "name": "$assertionsDisabled",
-              "type": "boolean"
-            },
-            "offset": 33,
-            "opr": "get",
-            "static": true
-          },
-          {
-            "condition": "ne",
-            "offset": 36,
-            "opr": "ifz",
-            "target": 36
-          },
-          {
-            "index": 2,
-            "offset": 39,
-            "opr": "load",
-            "type": "int"
-          },
-          {
-            "condition": "eq",
-            "offset": 40,
-            "opr": "ifz",
-            "target": 36
-          },
-          {
-            "class": "java/lang/AssertionError",
-            "offset": 43,
-            "opr": "new"
-          },
-          {
-            "offset": 46,
-            "opr": "dup",
-            "words": 1
-          },
-          {
-            "access": "special",
-            "method": {
-              "args": [],
-              "is_interface": false,
-              "name": "<init>",
-              "ref": {
-                "kind": "class",
-                "name": "java/lang/AssertionError"
-              },
-              "returns": null
-            },
-            "offset": 47,
-            "opr": "invoke"
-          },
-          {
-            "offset": 50,
-            "opr": "throw"
-          },
-          {
             "amount": 1,
             "index": 1,
-            "offset": 51,
+            "offset": 33,
             "opr": "incr"
           },
           {
-            "offset": 54,
+            "offset": 36,
             "opr": "goto",
             "target": 17
           },
           {
-            "offset": 57,
+            "offset": 39,
             "opr": "return",
             "type": null
           }
@@ -2596,32 +2676,24 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 132,
+            "line": 156,
             "offset": 0
           },
           {
-            "line": 134,
+            "line": 158,
             "offset": 15
           },
           {
-            "line": 135,
+            "line": 159,
             "offset": 21
           },
           {
-            "line": 136,
-            "offset": 24
-          },
-          {
-            "line": 137,
+            "line": 158,
             "offset": 28
           },
           {
-            "line": 134,
-            "offset": 36
-          },
-          {
-            "line": 140,
-            "offset": 38
+            "line": 161,
+            "offset": 30
           }
         ],
         "max_locals": 3,
@@ -2644,11 +2716,11 @@
             "type": "append_frame"
           },
           {
-            "index": 36,
+            "index": 28,
             "type": "same"
           },
           {
-            "index": 38,
+            "index": 30,
             "info": 1,
             "type": "chop_frame"
           }
@@ -2766,23 +2838,23 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 145,
+            "line": 166,
             "offset": 0
           },
           {
-            "line": 146,
+            "line": 167,
             "offset": 2
           },
           {
-            "line": 148,
+            "line": 169,
             "offset": 4
           },
           {
-            "line": 149,
+            "line": 170,
             "offset": 8
           },
           {
-            "line": 152,
+            "line": 173,
             "offset": 12
           }
         ],
@@ -2817,6 +2889,7 @@
     },
     {
       "access": [
+        "public",
         "static"
       ],
       "annotations": [],
@@ -2827,84 +2900,44 @@
             "offset": 0,
             "opr": "push",
             "value": {
-              "type": "class",
-              "value": {
-                "kind": "class",
-                "name": "jpamb/cases/BloatedMain"
-              }
+              "type": "integer",
+              "value": 10
             }
           },
           {
-            "access": "virtual",
-            "method": {
-              "args": [],
-              "name": "desiredAssertionStatus",
-              "ref": {
-                "kind": "class",
-                "name": "java/lang/Class"
-              },
-              "returns": "boolean"
-            },
+            "index": 0,
             "offset": 2,
-            "opr": "invoke"
+            "opr": "store",
+            "type": "int"
           },
           {
-            "condition": "ne",
-            "offset": 5,
-            "opr": "ifz",
-            "target": 5
+            "index": 0,
+            "offset": 3,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 20
+            }
+          },
+          {
+            "offset": 6,
+            "operant": "add",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 7,
+            "opr": "store",
+            "type": "int"
           },
           {
             "offset": 8,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 1
-            }
-          },
-          {
-            "offset": 9,
-            "opr": "goto",
-            "target": 6
-          },
-          {
-            "offset": 12,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "field": {
-              "class": "jpamb/cases/BloatedMain",
-              "name": "$assertionsDisabled",
-              "type": "boolean"
-            },
-            "offset": 13,
-            "opr": "put",
-            "static": true
-          },
-          {
-            "offset": 16,
-            "opr": "push",
-            "value": {
-              "type": "integer",
-              "value": 0
-            }
-          },
-          {
-            "field": {
-              "class": "jpamb/cases/BloatedMain",
-              "name": "helperVisited",
-              "type": "boolean"
-            },
-            "offset": 17,
-            "opr": "put",
-            "static": true
-          },
-          {
-            "offset": 20,
             "opr": "return",
             "type": null
           }
@@ -2912,37 +2945,241 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 17,
+            "line": 180,
             "offset": 0
           },
           {
-            "line": 19,
-            "offset": 7
-          }
-        ],
-        "max_locals": 0,
-        "max_stack": 1,
-        "stack_map": [
-          {
-            "index": 5,
-            "type": "same"
+            "line": 181,
+            "offset": 2
           },
           {
-            "index": 6,
-            "info": {
-              "type": "integer"
-            },
-            "type": "same_locals_1_stack_item_frame"
+            "line": 185,
+            "offset": 6
           }
-        ]
+        ],
+        "max_locals": 1,
+        "max_stack": 2,
+        "stack_map": null
       },
       "default": null,
       "exceptions": [],
-      "name": "<clinit>",
+      "name": "completelyUncalledHelper",
       "params": [],
       "returns": {
         "annotations": [],
         "type": null
+      },
+      "typeparams": []
+    },
+    {
+      "access": [
+        "public",
+        "static"
+      ],
+      "annotations": [
+        {
+          "is_runtime_visible": true,
+          "type": "jpamb/utils/Tag",
+          "values": {
+            "value": {
+              "type": "array",
+              "value": [
+                {
+                  "type": "enum",
+                  "value": {
+                    "name": "ARRAY",
+                    "type": {
+                      "kind": "class",
+                      "name": "jpamb/utils/Tag$TagType"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "code": {
+        "annotations": [],
+        "bytecode": [
+          {
+            "offset": 0,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 3
+            }
+          },
+          {
+            "dim": 1,
+            "offset": 1,
+            "opr": "newarray",
+            "type": "int"
+          },
+          {
+            "offset": 3,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 4,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "offset": 5,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 7
+            }
+          },
+          {
+            "offset": 7,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 8,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 9,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "offset": 10,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 7
+            }
+          },
+          {
+            "offset": 12,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "offset": 13,
+            "opr": "dup",
+            "words": 1
+          },
+          {
+            "offset": 14,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 15,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 7
+            }
+          },
+          {
+            "offset": 17,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 18,
+            "opr": "store",
+            "type": "ref"
+          },
+          {
+            "index": 0,
+            "offset": 19,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "offset": 20,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 21,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 99
+            }
+          },
+          {
+            "offset": 23,
+            "opr": "array_store",
+            "type": "int"
+          },
+          {
+            "index": 0,
+            "offset": 24,
+            "opr": "load",
+            "type": "ref"
+          },
+          {
+            "offset": 25,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 2
+            }
+          },
+          {
+            "offset": 26,
+            "opr": "array_load",
+            "type": "int"
+          },
+          {
+            "offset": 27,
+            "opr": "return",
+            "type": "int"
+          }
+        ],
+        "exceptions": [],
+        "lines": [
+          {
+            "line": 189,
+            "offset": 0
+          },
+          {
+            "line": 190,
+            "offset": 15
+          },
+          {
+            "line": 191,
+            "offset": 19
+          }
+        ],
+        "max_locals": 1,
+        "max_stack": 4,
+        "stack_map": null
+      },
+      "default": null,
+      "exceptions": [],
+      "name": "unusedArrayMutation",
+      "params": [],
+      "returns": {
+        "annotations": [],
+        "type": {
+          "base": "int"
+        }
       },
       "typeparams": []
     }
