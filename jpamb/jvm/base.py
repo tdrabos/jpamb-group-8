@@ -597,6 +597,8 @@ class Value:
                 return str(self.value)
             case Char():
                 return f"'{self.value}'"
+            case Float():
+                return f"'{self.value}'"
             case Array(content):
                 assert isinstance(self.value, Iterable)
                 match content:
@@ -606,6 +608,9 @@ class Value:
                     case Char():
                         chars = ", ".join(map(lambda a: f"'{a}'", self.value))
                         return f"[C:{chars}]"
+                    case Float():
+                        floats = ", ".join(map(str, self.value))
+                        return f"[F:{floats}]"
                     case _:
                         raise NotImplementedError()
             case _:
@@ -623,6 +628,10 @@ class Value:
     def char(cls, char: str) -> Self:
         assert len(char) == 1, f"string should be exactly one char, was {char!r}"
         return cls(Char(), char)
+    
+    @classmethod
+    def float(cls, n: float) -> Self:
+        return cls(Float(), n)
 
     @classmethod
     def array(cls, type: Type, content: Iterable) -> Self:
@@ -664,6 +673,7 @@ class ValueParser:
         token_specification = [
             ("OPEN_ARRAY", r"\[[IC]:"),
             ("CLOSE_ARRAY", r"\]"),
+            ("FLOAT", r"-?(?:\d+\.\d*|\.\d+)"),
             ("INT", r"-?\d+"),
             ("BOOL", r"true|false"),
             ("CHAR", r"'[^']'"),
@@ -708,6 +718,8 @@ class ValueParser:
     def parse_value(self):
         next = self.head or self.expected("token")
         match next.kind:
+            case "FLOAT":
+                return Value.float(self.parse_float())
             case "INT":
                 return Value.int(self.parse_int())
             case "CHAR":
@@ -729,6 +741,10 @@ class ValueParser:
     def parse_char(self):
         tok = self.expect("CHAR")
         return tok.value[1]
+    
+    def parse_float(self):
+        tok = self.expect("FLOAT")
+        return float(tok.value)
 
     def parse_array(self):
         key = self.expect("OPEN_ARRAY")
@@ -738,6 +754,8 @@ class ValueParser:
         elif key.value == "[C:":  # ]
             type = Array(Char())
             parser = self.parse_char
+        elif key.value == "[F:": #]"
+            type = Array(Float())
         else:
             self.expected("int or char array")
 

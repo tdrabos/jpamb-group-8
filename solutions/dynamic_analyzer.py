@@ -1,7 +1,8 @@
+#!/usr/bin/env python3
 import random
 import jpamb
 from jpamb import jvm
-from interpreter import Frame, State, Stack, step  # your interpreter
+from interpreter import Frame, State, Stack, step #Interpreter  # your interpreter
 import sys
 
 
@@ -18,10 +19,10 @@ import sys
 # ANOTHER TODO: 
 # Check runs with the new types (float, bool, array)
 methodid, input = jpamb.getcase()
+#interp = Interpreter()
 
 frame = Frame.from_method(methodid)
 state = State({}, Stack.empty().push(frame))
-
 
 # GENERATE VALUES: INT, BOOLEAN, FLOATS, ARRAYS:
 def gen_value(param_type, state):
@@ -304,7 +305,7 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
             frame = Frame.from_method(methodid)
             state = State({}, Stack.empty().push(frame))
             
-            input_values = [gen_value(param_type) for param_type in methodid.extension.params]
+            input_values = [gen_value(param_type, state) for param_type in methodid.extension.params]
 
             for i, v in enumerate(input_values):
                 if isinstance(v, bool):
@@ -376,7 +377,7 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
                 # else:
                 #     frame.locals[i] = jvm.Value.int(v)
 
-            #state = State({}, Stack.empty().push(frame))
+            state = State({}, Stack.empty().push(frame))
             for _ in range(1000):
                 state = step(state)  # advance the frame first
 

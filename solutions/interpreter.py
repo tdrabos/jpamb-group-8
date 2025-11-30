@@ -6,12 +6,14 @@ import sys
 from loguru import logger
 import random
 from jpamb.jvm.base import MethodID
+from jpamb.jvm.opcode import CompareFloating
+#import jpamb.jvm.opcode as jvm
+import math
 
 logger.remove()
 logger.add(sys.stderr, format="[{level}] {message}")
 
 methodid, input = jpamb.getcase()
-
 
 @dataclass(frozen=True, slots=True)
 class PC:
@@ -89,9 +91,10 @@ class Frame:
 class State:
     heap: dict[int, jvm.Value]
     frames: Stack[Frame]
+    #interpreter: object
 
     def __str__(self):
-        return f"{self.heap} {self.frames}"
+        return f"{self.heap} {self.frames} " #{self.interpreter}
     
 # def newHeapAddr(heap: dict[int, list[jvm.Value]]) -> int:
 #     if not heap:
@@ -316,12 +319,12 @@ def step(state: State) -> State | str:
             return state 
         
 #array store 
-        case jvm.ArrayStore(element_type=t):
+        case jvm.ArrayStore(type=t):
             value = frame.stack.pop()
             index = frame.stack.pop()
             arrRef = frame.stack.pop()
 
-            #assert index.type is jvm.Int(), f"array index must be int, got {index}"
+            assert index.type is jvm.Int(), f"array index must be int, got {index}"
             
             arrRef = ensureArrayIsRef(arrRef, state)
             # so since arrays are supposed to be stored as references, this 
@@ -350,6 +353,9 @@ def step(state: State) -> State | str:
             #         state.heap[addr] = heapArr
             #         v = jvm.Value(jvm.Reference(), addr)
             arr = state.heap[arrRef.value]
+            if isinstance(t, jvm.Boolean) and value.type is jvm.Int():
+                value = jvm.Value.boolean(bool(value.value))
+
             if isinstance(t, jvm.Int):
                 assert value.type is jvm.Int(), f"expected int element, got {value}"
             elif isinstance(t, jvm.Boolean):
@@ -364,13 +370,17 @@ def step(state: State) -> State | str:
                 assert value.type is jvm.Char(), f"expected char element, got {value}"
             elif isinstance(t, jvm.Short):
                 assert value.type is jvm.Short(), f"expected char element, got {value}"
-            elif isinstance(t, jvm.Byte):
-                assert value.type is jvm.Byte(), f"expected byte element, got {value}"
-            else:
+                #taking out since due to storing in array store in opcode boolean and byte are the same so there is confusion with byte in here
+            # elif isinstance(t, jvm.Byte): 
+            #     assert value.type is jvm.Byte(), f"expected byte element, got {value}"
+            # else:
                 assert value.type is jvm.Reference(), f"expected reference element, got {value}"
             # if arr is None:
             #     return "null"
+
             arr[index.value] = value
+            if index.value < 0 or index.value >= len(arr):
+                return "array out of bounds"
             frame.pc += 1
             return state 
 
@@ -703,8 +713,27 @@ def step(state: State) -> State | str:
             frame.pc += 1
             return state
         
+        #Special floats
+        case jvm.CompareFloating(offset=_, type=ftype, onnan = onnan):
+            v2, v1 = frame.stack.pop(), frame.stack.pop()
+            assert v1.type is jvm.Float()
+            assert v2.type is jvm.Float()
+
+            # onnan = -1 if dir == "l" else 1
+            # val1, val2 = float(v1.value), float(v2.value)
+
+            if math.isnan(v1.value) or math.isnan(v2.value):
+                result = onnan #-1 if dir == "l" else 1
+            else:
+                result = -1 if v1.value < v2.value else (1 if v1.value > v2.value else 0)
+
+            frame.stack.push(jvm.Value(jvm.Int(), result))
+            frame.pc += 1
+            return state 
+        
 # Conditionals        
         case jvm.If(condition=cond, target=t):
+            jump = False
             v2, v1  = frame.stack.pop(), frame.stack.pop()
             if v1.type is jvm.Reference() and v2.type is jvm.Reference():
                 match cond:
@@ -722,7 +751,7 @@ def step(state: State) -> State | str:
                 # assert v1.type is jvm.Boolean(), f"expected bool, but got {v1}"
                 # assert v2.type is jvm.Boolean(), f"expected bool, but got {v2}"
             #"""jvm.Boolean""" """jvm.Float, jvm.Double, jvm.Long""" add later
-            elif isinstance(v1.type, jvm.Int ) and isinstance(v2.value, jvm.Int):
+            elif isinstance(v1.type, jvm.Int ) and isinstance(v2.type, jvm.Int):
                 match cond:
                     case "eq": jump = (v1.value == v2.value)
                     case "ne": jump = (v1.value != v2.value)
@@ -750,6 +779,7 @@ def step(state: State) -> State | str:
             return state
 
         case jvm.Ifz(condition=cond, target=t):
+            jump = False
             v1 = frame.stack.pop()
             if v1.type is jvm.Reference():
                 match cond:
@@ -958,10 +988,80 @@ def step(state: State) -> State | str:
                     frame.pc +=1
             return state
 
-    
+        case jvm.Incr(index=i, amount=a):
+    # Load current local
+            v = frame.locals.get(i, None)
+            if v is None:
+                raise RuntimeError(f"Local {i} not initialized before incr")
+
+            if not isinstance(v.type, jvm.Int):
+                raise TypeError(f"iinc expects Int local, got {v.type}")
+
+    # Create new value
+            new_val = jvm.Value(jvm.Int(), v.value + a)
+
+    # Store it back
+            frame.locals[i] = new_val
+
+    # Move PC
+            frame.pc += 1
+            return state
         
+        case jvm.InvokeStatic(method=m):
+    # 1. Get the target method definition
+            target_method = state.interpreter.resolve_method(m)
+
+    # 2. Determine number of parameters
+            param_types = target_method.params
+            num_params = len(param_types)
+
+    # 3. Pop arguments from the caller stack (reverse order)
+            args = []
+            for _ in range(num_params):
+                args.append(frame.stack.pop())
+            args = args[::-1]
+
+    # 4. Create a new frame
+            new_frame = Frame(
+                method=target_method,
+                pc=PC(target_method, 0),
+                stack=Stack.empty(),
+                locals={}
+            )
+
+    # 5. Load arguments into new frame locals
+            for i, arg in enumerate(args):
+                new_frame.locals[i] = arg
+
+    # 6. Push current frame onto call stack
+            state.frames.push(new_frame)
+
+    # 7. Switch to new frame
+            #state.frame = new_frame
+
+            return state
+        
+        case jvm.Return(value_type=t):
+            if t is not None:
+
+                retval = frame.stack.pop()
+            state.frames.pop()
+            
+            if state.frames:
+    # Pop previous frame
+                caller = state.frames.peek()
+                if t is not None:
+
+    # Put return value on caller’s stack
+                    caller.stack.push(retval)
+                caller.pc += 1
+                return state
+            else:
+                return "ok"
+
         case a:
             raise NotImplementedError(f"Don't know how to handle: {a!r}")
+        
 
 
 
@@ -1011,11 +1111,14 @@ def step(state: State) -> State | str:
 # #END ------------------------------------------------------------------------------------
 
 
+
 frame = Frame.from_method(methodid)
 for i, v in enumerate(input.values):
     frame.locals[i] = v
 
 state = State({}, Stack.empty().push(frame))
+#state = State({}, Stack.empty().push(frame), interpreter)
+
 #from dimitra
 for i, v in enumerate(input.values):
     # Convert JVM types to JVM Value objects
