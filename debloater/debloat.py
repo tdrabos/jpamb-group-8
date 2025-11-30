@@ -4,7 +4,7 @@ from loguru import logger
 
 from debloater.method_debloater import Debloat
 from debloater.static.abstract_interpreter import static_bytecode_analysis
-from debloater.syntax_analyzer import call_graph
+from debloater.syntactic.call_graph_builder import call_graph
 from jpamb.jvm.base import AbsMethodID
 
 logger.remove()
