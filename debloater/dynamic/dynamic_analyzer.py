@@ -2,10 +2,10 @@
 import random
 import jpamb
 from jpamb import jvm
-from solutions.interpreter import Frame, State, Stack, step #Interpreter  # your interpreter
+from interpreter import Frame, State, Stack, step #Interpreter  # your interpreter
 import sys
 # to use the random input generator
-from debloater.syntactic.combined_input_generator import CombinedInputGenerator
+from syntactic.combined_input_generator import CombinedInputGenerator
 
 
 # TODO: Lets only use this class to do the dynamic analyzer.
