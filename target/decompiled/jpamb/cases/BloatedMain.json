@@ -2393,6 +2393,84 @@
           },
           {
             "offset": 48,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 0
+            }
+          },
+          {
+            "index": 1,
+            "offset": 49,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 50,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "index": 2,
+            "offset": 51,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "index": 1,
+            "offset": 52,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "eq",
+            "offset": 53,
+            "opr": "ifz",
+            "target": 49
+          },
+          {
+            "index": 1,
+            "offset": 56,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "condition": "ne",
+            "offset": 57,
+            "opr": "ifz",
+            "target": 49
+          },
+          {
+            "offset": 60,
+            "opr": "push",
+            "value": {
+              "type": "integer",
+              "value": 1
+            }
+          },
+          {
+            "index": 1,
+            "offset": 61,
+            "opr": "load",
+            "type": "int"
+          },
+          {
+            "offset": 62,
+            "operant": "div",
+            "opr": "binary",
+            "type": "int"
+          },
+          {
+            "index": 2,
+            "offset": 63,
+            "opr": "store",
+            "type": "int"
+          },
+          {
+            "offset": 64,
             "opr": "return",
             "type": null
           }
@@ -2420,11 +2498,27 @@
             "offset": 35
           },
           {
-            "line": 153,
+            "line": 154,
             "offset": 37
+          },
+          {
+            "line": 155,
+            "offset": 39
+          },
+          {
+            "line": 157,
+            "offset": 41
+          },
+          {
+            "line": 158,
+            "offset": 45
+          },
+          {
+            "line": 160,
+            "offset": 49
           }
         ],
-        "max_locals": 2,
+        "max_locals": 3,
         "max_stack": 4,
         "stack_map": [
           {
@@ -2455,6 +2549,18 @@
             "index": 37,
             "info": 1,
             "type": "chop_frame"
+          },
+          {
+            "index": 49,
+            "info": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "append_frame"
           }
         ]
       },
@@ -2676,23 +2782,23 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 156,
+            "line": 163,
             "offset": 0
           },
           {
-            "line": 158,
+            "line": 165,
             "offset": 15
           },
           {
-            "line": 159,
+            "line": 166,
             "offset": 21
           },
           {
-            "line": 158,
+            "line": 165,
             "offset": 28
           },
           {
-            "line": 161,
+            "line": 168,
             "offset": 30
           }
         ],
@@ -2838,23 +2944,23 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 166,
+            "line": 173,
             "offset": 0
           },
           {
-            "line": 167,
+            "line": 174,
             "offset": 2
           },
           {
-            "line": 169,
+            "line": 176,
             "offset": 4
           },
           {
-            "line": 170,
+            "line": 177,
             "offset": 8
           },
           {
-            "line": 173,
+            "line": 180,
             "offset": 12
           }
         ],
@@ -2945,15 +3051,15 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 180,
+            "line": 187,
             "offset": 0
           },
           {
-            "line": 181,
+            "line": 188,
             "offset": 2
           },
           {
-            "line": 185,
+            "line": 192,
             "offset": 6
           }
         ],
@@ -3155,15 +3261,15 @@
         "exceptions": [],
         "lines": [
           {
-            "line": 189,
+            "line": 196,
             "offset": 0
           },
           {
-            "line": 190,
+            "line": 197,
             "offset": 15
           },
           {
-            "line": 191,
+            "line": 198,
             "offset": 19
           }
         ],

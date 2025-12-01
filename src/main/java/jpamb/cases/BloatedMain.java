@@ -150,6 +150,13 @@ public class BloatedMain {
             if (i == 1) items[i] = true; // reachable and has observable effect
             if (i == 3) items[i] = false; // candidate for debloating
         }
+
+        int n = 0;
+        int res = 1;
+
+        if (n != 0 && n == 0) { // logically impossible
+            res = 1 / n; // unreachable
+        }
     }
 
     public static void unreachableArrayOutOfBounds() {

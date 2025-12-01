@@ -129,6 +129,8 @@ public class BloatedMainDebloated {
         for (int i = 0; i < items.length; i++) {
             if (i == 1) items[i] = true; // reachable and has observable effect
         }
+
+        int n = 0;
     }
 
     public static void unreachableArrayOutOfBounds() {
@@ -150,18 +152,4 @@ public class BloatedMainDebloated {
     // TWO METHODS THAT ARE NEVER CALLED, thus unreachable from main.
     // Should be pre-pruned by syntaxer
 
-    public static void completelyUncalledHelper() {
-        int x = 10;
-        x = x + 20; // dead store
-        if (false) {
-            System.out.println(x);
-        }
-    }
-
-    @Tag({ ARRAY })
-    public static int unusedArrayMutation() {
-        int[] a = { 7, 7, 7 };
-        a[2] = 99; // observable internally, but method never called
-        return a[2];
-    }
 }

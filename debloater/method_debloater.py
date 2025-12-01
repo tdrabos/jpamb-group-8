@@ -240,6 +240,9 @@ class Debloat:
         }
         not_called_methods: [method_id_as_str]
         """
+        if not_called_methods is not None:
+            unused_method_lines = self.remove_methods_by_name(not_called_methods)
+        
         # 1) Collect ALL line numbers to delete across all methods
         all_lines_to_delete: set[int] = set()
         for method_name, info in spec.items():
@@ -247,6 +250,9 @@ class Debloat:
             if lines:
                 self.register_deletions(method_name, lines)
                 all_lines_to_delete.update(lines)
+                
+        if unused_method_lines is not None:
+            all_lines_to_delete.update(unused_method_lines)
 
         # 2) Delete those lines from the source once (line numbers refer to original file)
         debloated = self.debloat_source(sorted(all_lines_to_delete))
@@ -255,8 +261,6 @@ class Debloat:
         debloated = remove_args_from_methods(debloated, spec)
         
         # 4) Remove unreachable methods if exists
-        if not_called_methods is not None:
-            self.remove_methods_by_name(not_called_methods)
         
         # 5) Rename class, because classname should be = to filename
         new_class_name = class_name + "Debloated"
@@ -270,9 +274,7 @@ class Debloat:
         return output_path
     
     def remove_methods_by_name(self, method_names: list[str]) -> str:
-        # 1) Parse Java source
-        print(method_names)
-        
+        # 1) Parse Java source        
         m_names = list()
         
         for m in method_names:
@@ -299,7 +301,6 @@ class Debloat:
 
             # 3) Get the method name
             name_node = node.child_by_field_name("name")
-            
             print(f"FOUND: {name_node.text}")
             
             if not name_node or not name_node.text:
@@ -317,7 +318,7 @@ class Debloat:
                 lines_to_delete.add(ln)
 
 
-        print(lines_to_delete)
+        return lines_to_delete
         # 5) Delete all those lines in a single pass
         new_source = self.debloat_source(sorted(lines_to_delete))
         new_source = self.compress_blank_lines(new_source)
