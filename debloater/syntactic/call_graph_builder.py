@@ -5,7 +5,8 @@ import tree_sitter
 import jpamb
 from pathlib import Path
 from tree_sitter import QueryCursor
-from syntaxer_base import BaseSyntaxer, QueryRegistry, Method
+#from syntaxer_base import BaseSyntaxer, QueryRegistry, Method
+from .syntaxer_base import BaseSyntaxer, QueryRegistry, Method
 
 # TODO: Expected output of this whole thing:
 # A list of Method ID STRINGS, which are in the following format:
