@@ -2,7 +2,7 @@ import z3
 from pathlib import Path
 from tree_sitter import QueryCursor
 import logging
-from syntaxer_base import BaseSyntaxer, QueryRegistry
+from .syntaxer_base import BaseSyntaxer, QueryRegistry
 import jpamb
 from jpamb.jvm.base import (
     Boolean,
