@@ -114,7 +114,7 @@ class BaseSyntaxer(ABC):
     def input_check(self) -> bool:
         srcfile = jpamb.sourcefile(self.method_id).relative_to(Path.cwd())
         with open(srcfile, "rb") as f:
-            log.debug("parse sourcefile %s", srcfile)
+            #log.debug("parse sourcefile %s", srcfile)
             tree = self.parser.parse(f.read())
         simple_classname = str(self.method_id.classname.name)
 

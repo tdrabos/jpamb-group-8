@@ -120,7 +120,7 @@ class Z3InputGenerator(BaseSyntaxer):
         if recv and field and field.type == 'identifier' and field.text.decode() == 'length':
             if recv.type == 'identifier':
                 arr_name = recv.text.decode()
-                return self._get_or_create_int(f"{arr_name}_length")
+                return self.get_or_create_int(f"{arr_name}_length")
         return None
 
     def handle_array_access(self, node, var_states):

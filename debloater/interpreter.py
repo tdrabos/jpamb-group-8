@@ -205,7 +205,7 @@ def step(state: State) -> State | str:
     assert isinstance(state, State), f"expected frame but got {state}"
     frame = state.frames.peek()
     opr = bc[frame.pc]
-    logger.debug(f"STEP {opr}\n{state}")
+    #logger.debug(f"STEP {opr}\n{state}")
     match opr:
 # Push
         case jvm.Push(value=v):
@@ -832,6 +832,7 @@ def step(state: State) -> State | str:
             #The return instruction can return a void or a value
             assert t is None or isinstance(t,jvm.Type), f"Expected JVM type or None, got a {t!r}"
 
+            v1 = None
             if t:
                 v1 = frame.stack.pop()
                 #The returned value must be a JVM Value
@@ -845,7 +846,7 @@ def step(state: State) -> State | str:
                 frame.pc += 1
                 return state
             else:
-                return "ok"
+                return v1.value if v1 is not None else "ok"
           # unecessary since the above retrieves then returns the type  
         # case jvm.Return(type=jvm.Boolean()):
         #     v1 = frame.stack.pop()
@@ -1147,15 +1148,12 @@ def run():
                 v = jvm.Value(jvm.Reference(), addr)  # wrap as reference
     for x in range(1000):
         state = step(state)
-        if isinstance(state, str):
-            print(state)
+        if not isinstance(state, State):
+            #print(state)
             break
     else:
         print("*")
 
-if __name__ == "__main__":
-    # methodid, input = jpamb.getcase()
-    run()
 
 
 

@@ -172,7 +172,7 @@ class CallGraphBuilder(BaseSyntaxer):
             if fpath in parsed_trees:
                 ftree = parsed_trees[fpath]
             else:
-                log.debug("parse sourcefile %s", fpath)
+                #log.debug("parse sourcefile %s", fpath)
                 with open(fpath, "rb") as fh:
                     ftree = self.parser.parse(fh.read())
                 parsed_trees[fpath] = ftree
@@ -182,7 +182,7 @@ class CallGraphBuilder(BaseSyntaxer):
             for imp in self._get_imports(ftree):
                 imp_path = self._resolve_import_to_path(imp, src_root)
                 if imp_path and imp_path not in visited:
-                    log.debug("Following import %s -> %s", imp, imp_path)
+                    #log.debug("Following import %s -> %s", imp, imp_path)
                     queue.append(imp_path)
 
         all_java_files = list(project_root.rglob("*.java")) + list(project_root.rglob("*.Java"))
@@ -194,7 +194,7 @@ class CallGraphBuilder(BaseSyntaxer):
             if fpath in parsed_trees:
                 ftree = parsed_trees[fpath]
             else:
-                log.debug("parse sourcefile %s", fpath)
+                #log.debug("parse sourcefile %s", fpath)
                 with open(fpath, "rb") as fh:
                     ftree = self.parser.parse(fh.read())
                 parsed_trees[fpath] = ftree

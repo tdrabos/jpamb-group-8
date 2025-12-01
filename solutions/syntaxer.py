@@ -28,7 +28,7 @@ log.basicConfig(level=logging.DEBUG)
 srcfile = jpamb.sourcefile(methodid).relative_to(Path.cwd())
 
 with open(srcfile, "rb") as f:
-    log.debug("parse sourcefile %s", srcfile)
+    #log.debug("parse sourcefile %s", srcfile)
     tree = parser.parse(f.read())
 
 simple_classname = str(methodid.classname.name)

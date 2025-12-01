@@ -2,10 +2,10 @@
 import random
 import jpamb
 from jpamb import jvm
-from interpreter import Frame, State, Stack, step #Interpreter  # your interpreter
+from debloater.interpreter import Frame, State, Stack, step #Interpreter  # your interpreter
 import sys
 # to use the random input generator
-from syntactic.combined_input_generator import CombinedInputGenerator
+from debloater.syntactic.combined_input_generator import CombinedInputGenerator
 
 
 # TODO: Lets only use this class to do the dynamic analyzer.
@@ -20,11 +20,11 @@ from syntactic.combined_input_generator import CombinedInputGenerator
 
 # ANOTHER TODO: 
 # Check runs with the new types (float, bool, array)
-methodid, input = jpamb.getcase()
+#methodid, input = jpamb.getcase()
 #interp = Interpreter()
 
-frame = Frame.from_method(methodid)
-state = State({}, Stack.empty().push(frame))
+# frame = Frame.from_method(methodid)
+# state = State({}, Stack.empty().push(frame))
 
 #trying to get input generator to work
 # the random input generator returns strings and the dynamic analyzer uses JVM runtime values
@@ -161,55 +161,30 @@ def run_random_dynamic_analysis(methodid, num_trials=100):
     print(f"{methodid.extension.name}: 100%" if found_query_behavior else f"{methodid.extension.name}: 50%")
 
 
-
-
-
-
-
-
 # FUNCTION IF YOU WANT TO USE INTERESTING VALUES AND RANDOM INPUTS:
 # Dynamic analysis using interesting values + random fallback
-def run_interesting_dynamic_analysis(methodid, num_trials=100):
-    found_query_behavior = False
-    interesting_values = [1, -3, 0]  # Try these first
-    interesting_index = 0
+def run_interesting_dynamic_analysis(methodid: jvm.AbsMethodID, inputs: list[any], num_trials=100):
+    # Create frame and pre-fill locals
+    frame = Frame.from_method(methodid)
+    for i, v in enumerate(inputs):
+        if isinstance(v, bool):
+            frame.locals[i] = jvm.Value.int(1 if v else 0)
+        elif isinstance(v, float):
+            frame.locals[i] = jvm.Value.float(v)
+        elif isinstance(v, list):
+            frame.locals[i] = jvm.Value.array(v)  # adjust depending on your JVM array type
+        else:
+            frame.locals[i] = jvm.Value.int(v)
+    
+    # Run interpreter
+    state = State({}, Stack.empty().push(frame))
 
-    for _ in range(num_trials):
-        input_values = []
-
-        for param_type in methodid.extension.params:
-            val, interesting_index = gen_value(param_type, interesting_values, interesting_index)
-            input_values.append(val)
-
-        # Create frame and pre-fill locals
-        frame = Frame.from_method(methodid)
-        for i, v in enumerate(input_values):
-            if isinstance(v, bool):
-                frame.locals[i] = jvm.Value.int(1 if v else 0)
-            elif isinstance(v, float):
-                frame.locals[i] = jvm.Value.float(v)
-            elif isinstance(v, list):
-                frame.locals[i] = jvm.Value.array(v)  # adjust depending on your JVM array type
-            else:
-                frame.locals[i] = jvm.Value.int(v)
-
-        # Run interpreter
-        state = State({}, Stack.empty().push(frame))
-        for _ in range(1000):
-            state = step(state)
-            if isinstance(state, str) and state == "divide by zero":
-                found_query_behavior = True
-                print("divide by zero")
-                break
-
-    print("Params for", methodid.extension.name, ":", methodid.extension.params)
-    print(f"{methodid.extension.name}: 100%" if found_query_behavior else f"{methodid.extension.name}: 50%")
-
-
-
-
-
-
+    while isinstance(state, State):
+        state = step(state)
+        if not isinstance(state, State):
+            break
+        
+    return state
 
 
 # HELPER FUNCTION to generate small numbers for the run_smallcheck_dynamic_analysis function
@@ -267,9 +242,7 @@ def run_smallcheck_dynamic_analysis(methodid, num_trials=100):
     print("Params for", methodid.extension.name, ":", methodid.extension.params)
     print(f"{methodid.extension.name}: 100%" if found_query_behavior else f"{methodid.extension.name}: 50%")
 
-
-
-
+    return state
 
 
 
@@ -297,7 +270,7 @@ def makeJvmArray(rawArray, componentType, state):
 
 
 # FUNCTION FOR IF YOU WANT TO GET THE COVERAGE:
-def run_coverage_guided_analysis(methodid, num_trials=100):
+def run_coverage_guided_analysis(methodid, num_trials=3):
     input_gen = CombinedInputGenerator()
     try:
         method_str = methodid.encoded()
@@ -337,7 +310,8 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
             print(f"[coverage] conversion error for tuple {i}: {e}")
             continue
 
-        frame = state.stack.peek()
+        frame = state.frames.peek()
+        coverage_seen.add(frame.pc.offset)
         for i, v in enumerate(input_values):
             # if v is already a jvm.Value reference or primitive wrapper, assign directly
             frame.locals[i] = v
@@ -372,10 +346,7 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
             # Optional debug
             # print("[DEBUG] frame.pc =", frame.pc)
 
-            if isinstance(state, str):
-                # handle crash or special signals
-                if state == "divide by zero":
-                    print("divide by zero")
+            if not isinstance(state, State):
                 break
 
         # If we didn't get any coverage from this seed, optionally mutate and requeue
@@ -387,8 +358,14 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
                     seeds_queue.append(extra[0])
             except Exception:
                 pass
+            
+    all_ops = set(jpamb.Suite().method_opcodes(methodid))
+    
+    all_offsets = {instr.offset for instr in all_ops}
 
-    print(f"{methodid.extension.name} coverage-guided: {len(coverage_seen)} offsets seen, paths: {coverage_seen}")
+    #print(f"{methodid.extension.name} coverage-guided: {len(coverage_seen)} offsets seen, paths: {coverage_seen} out of {all_offsets}")
+    
+    return len(all_offsets.intersection(coverage_seen)) / len(all_offsets) * 100
 
 
 
@@ -540,9 +517,16 @@ def run_coverage_guided_analysis(methodid, num_trials=100):
 
 
 
+def run(methodid, inputs):
+    output = run_interesting_dynamic_analysis(methodid, inputs)
+    return output
 
 
-
+def run_coverage(methodid):
+    output = run_coverage_guided_analysis(methodid)
+    return output
+    
+    
 import builtins
 
 if __name__ == "__main__":

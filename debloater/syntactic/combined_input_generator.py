@@ -4,8 +4,8 @@ from typing import Dict, List, Tuple
 import jpamb
 from jpamb.jvm.base import Type
 
-from random_input_generator import RandomInputGenerator
-from z3_input_generator import Z3InputGenerator
+from debloater.syntactic.random_input_generator import RandomInputGenerator
+from debloater.syntactic.z3_input_generator import Z3InputGenerator
 
 
 class CombinedInputGenerator:
@@ -77,11 +77,11 @@ def generate_inputs(methods: List[str], expected_count: int) -> Dict[str, List[T
     generator = CombinedInputGenerator()
     return generator.generate_inputs(methods, expected_count)
 
-called = [
-            "jpamb.cases.Bloated.unreachableBranchBasic:(I)I",
-            "jpamb.cases.Bloated.localInitButNotUsed:()I",
-            "jpamb.cases.Bloated.unreachableBranchFor:(I)I",
-            "jpamb.cases.Bloated.unreachableBranchWhile:(I)I"]
+# called = [
+#             "jpamb.cases.Bloated.unreachableBranchBasic:(I)I",
+#             "jpamb.cases.Bloated.localInitButNotUsed:()I",
+#             "jpamb.cases.Bloated.unreachableBranchFor:(I)I",
+#             "jpamb.cases.Bloated.unreachableBranchWhile:(I)I"]
 
-result = generate_inputs(called, 10)
-print(result)
+# result = generate_inputs(called, 10)
+# print(result)
