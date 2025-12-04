@@ -8,7 +8,7 @@ import jpamb
 from loguru import logger
 import json
 
-from solutions.interpreter import PC, Bytecode, Stack, State
+from debloater.interpreter import PC, Bytecode, Stack, State
 from debloater.static.abstractions.sign_abstraction import SignSet, holds
 from debloater.static.utils.json_utils import dead_indices_to_lines_in_class
 

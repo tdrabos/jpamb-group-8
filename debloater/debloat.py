@@ -11,7 +11,7 @@ logger.add(sys.stderr, format="[{level}] {message}", level="DEBUG")
 
 def main_analysis(execute = True, from_main=False):
     if from_main:
-        logger.info(f"Running CFG builder - looking for unreferenced functions:")
+        logger.info(f"Running Call Graph builder - looking for unreferenced functions:")
         called, not_called = call_graph(AbsMethodID.decode("jpamb.cases.BloatedMain.main:()I"), "BloatedMain")
     else:
         called = [
